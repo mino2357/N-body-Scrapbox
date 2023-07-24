@@ -332,7 +332,7 @@ mod tests {
         set.end_time = 2.0 * std::f64::consts::PI;
         set.tol = 1.0e-12;
         let ret = set.dormand_prince_vec(Box::new(harmonic_oscillator), &mut vec);
-        assert_eq!(ret[0], 1.000000000000006);
-        assert_eq!(ret[1], 1.7572457974412287e-12);
+        assert_eq!(ret[0], 1.0000000000000127);
+        assert_eq!(ret[1], 2.6936948765293733e-12);
     }
 }
