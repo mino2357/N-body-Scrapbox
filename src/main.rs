@@ -5,24 +5,30 @@ mod embedded_runge_kutta;
 #[allow(dead_code)]
 fn three_body(vec: &Vec<f64>) -> Vec<f64> {
     let mut ret = vec.clone();
+    let r04 = ((vec[0] - vec[4]) * (vec[0] - vec[4]) + (vec[1] - vec[5]) * (vec[1] - vec[5])).sqrt();
+    let r08 = ((vec[0] - vec[8]) * (vec[0] - vec[8]) + (vec[1] - vec[9]) * (vec[1] - vec[9])).sqrt();
+    let r48 = ((vec[4] - vec[8]) * (vec[4] - vec[8]) + (vec[5] - vec[9]) * (vec[5] - vec[9])).sqrt();
+    let r04_3 = r04 * r04 * r04;
+    let r08_3 = r08 * r08 * r08;
+    let r48_3 = r48 * r48 * r48;
     ret[0]  = vec[2];
     ret[1]  = vec[3];
-    ret[2]  = - 5.0 * (vec[0] - vec[4]) / ((vec[0] - vec[4]).powf(2.0) + (vec[1] - vec[5]).powf(2.0)).powf(3.0 / 2.0)
-              - 3.0 * (vec[0] - vec[8]) / ((vec[0] - vec[8]).powf(2.0) + (vec[1] - vec[9]).powf(2.0)).powf(3.0 / 2.0);
-    ret[3]  = - 5.0 * (vec[1] - vec[5]) / ((vec[0] - vec[4]).powf(2.0) + (vec[1] - vec[5]).powf(2.0)).powf(3.0 / 2.0)
-              - 3.0 * (vec[1] - vec[9]) / ((vec[0] - vec[8]).powf(2.0) + (vec[1] - vec[9]).powf(2.0)).powf(3.0 / 2.0);
+    ret[2]  = - 5.0 * (vec[0] - vec[4]) / r04_3
+              - 3.0 * (vec[0] - vec[8]) / r08_3;
+    ret[3]  = - 5.0 * (vec[1] - vec[5]) / r04_3
+              - 3.0 * (vec[1] - vec[9]) / r08_3;
     ret[4]  = vec[6];
     ret[5]  = vec[7];
-    ret[6]  = - 4.0 * (vec[4] - vec[0]) / ((vec[4] - vec[0]).powf(2.0) + (vec[5] - vec[1]).powf(2.0)).powf(3.0 / 2.0)
-              - 3.0 * (vec[4] - vec[8]) / ((vec[4] - vec[8]).powf(2.0) + (vec[5] - vec[9]).powf(2.0)).powf(3.0 / 2.0);
-    ret[7]  = - 4.0 * (vec[5] - vec[1]) / ((vec[4] - vec[0]).powf(2.0) + (vec[5] - vec[1]).powf(2.0)).powf(3.0 / 2.0)
-              - 3.0 * (vec[5] - vec[9]) / ((vec[4] - vec[8]).powf(2.0) + (vec[5] - vec[9]).powf(2.0)).powf(3.0 / 2.0);
+    ret[6]  = - 4.0 * (vec[4] - vec[0]) / r04_3
+              - 3.0 * (vec[4] - vec[8]) / r48_3;
+    ret[7]  = - 4.0 * (vec[5] - vec[1]) / r04_3
+              - 3.0 * (vec[5] - vec[9]) / r48_3;
     ret[8]  = vec[10];
     ret[9]  = vec[11];
-    ret[10] = - 4.0 * (vec[8] - vec[0]) / ((vec[8] - vec[0]).powf(2.0) + (vec[9] - vec[1]).powf(2.0)).powf(3.0 / 2.0)
-              - 5.0 * (vec[8] - vec[4]) / ((vec[8] - vec[4]).powf(2.0) + (vec[9] - vec[5]).powf(2.0)).powf(3.0 / 2.0);
-    ret[11] = - 4.0 * (vec[9] - vec[1]) / ((vec[8] - vec[0]).powf(2.0) + (vec[9] - vec[1]).powf(2.0)).powf(3.0 / 2.0)
-              - 5.0 * (vec[9] - vec[5]) / ((vec[8] - vec[4]).powf(2.0) + (vec[9] - vec[5]).powf(2.0)).powf(3.0 / 2.0);
+    ret[10] = - 4.0 * (vec[8] - vec[0]) / r08_3
+              - 5.0 * (vec[8] - vec[4]) / r48_3;
+    ret[11] = - 4.0 * (vec[9] - vec[1]) / r08_3
+              - 5.0 * (vec[9] - vec[5]) / r48_3;
     ret
 }
 
@@ -119,7 +125,7 @@ fn main() {
     
     for _i in 0..7100 {
         vec = set.dormand_prince_vec(Box::new(three_body), &vec);
-        println!("{}, {}, {}, {}, {}, {}, {}, {}", set.time, set.delta_t, vec[0], vec[1], vec[4], vec[5], vec[8], vec[9]);
+        //println!("{}, {}, {}, {}, {}, {}, {}, {}", set.time, set.delta_t, vec[0], vec[1], vec[4], vec[5], vec[8], vec[9]);
         n1x.push(vec[0]); n1y.push(vec[1]);
         n2x.push(vec[4]); n2y.push(vec[5]);
         n3x.push(vec[8]); n3y.push(vec[9]);
