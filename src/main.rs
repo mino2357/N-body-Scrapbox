@@ -98,6 +98,7 @@ fn main() {
         n_body.vec3.points.push(kd_tree::Grid2D { x: x1_r, y: y1_r });
         if n_body.vec2.points.len() == num_point {
             break;
+
         }
     }
 
