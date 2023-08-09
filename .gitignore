@@ -15,4 +15,12 @@ Cargo.lock
 
 .rustfmt.toml
 
+perf.*
+*.svg
+
+*.png
+!images/*.png
+
 *.log
+
+tmp/
