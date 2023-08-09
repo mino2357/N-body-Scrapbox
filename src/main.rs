@@ -21,7 +21,7 @@ fn draw_graph(i: usize, vec1: &kd_tree::Points2D) {
         .margin(5)
         .x_label_area_size(30)
         .y_label_area_size(30)
-        .build_cartesian_2d(-12.1..12.1, -12.1..12.1)
+        .build_cartesian_2d(-2.1..2.1, -2.1..2.1)
         .unwrap();
 
     chart.configure_mesh().draw().unwrap();
@@ -85,15 +85,14 @@ fn main() {
 
     let mut n_body = verlet_integration::VerletIntegration::new();
     n_body.radius = 1.0;
-    n_body.epsilon = 1.0e-2;
-    n_body.dt = 1.0e-4;
+    n_body.epsilon = 1.0e-1;
 
     loop {
         let x1_r = 2.0 * (rng.gen::<f64>() - 0.5);
         let y1_r = 2.0 * (rng.gen::<f64>() - 0.5);
         let v = 1.0 / (x1_r * x1_r + y1_r * y1_r).sqrt();
-        let x2_r = x1_r - 100.0 * v * n_body.dt * y1_r;
-        let y2_r = y1_r + 100.0 * v * n_body.dt * x1_r;
+        let x2_r = x1_r - 10.0 * v * n_body.dt * y1_r;
+        let y2_r = y1_r + 10.0 * v * n_body.dt * x1_r;
         n_body.vec2.points.push(kd_tree::Grid2D { x: x2_r, y: y2_r });
         n_body.vec3.points.push(kd_tree::Grid2D { x: x1_r, y: y1_r });
         if n_body.vec2.points.len() == num_point {
