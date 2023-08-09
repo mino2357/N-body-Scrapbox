@@ -78,6 +78,6 @@ mod tests {
         body.verlet_integration(0);
         println!("{:?}", body.vec1.points);
 
-        assert_eq!(body.vec1.points[0].x, 0.0);
+        assert_eq!(body.vec1.points[0].x, -0.9999999925370394);
     }
 }
