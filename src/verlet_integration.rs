@@ -79,28 +79,15 @@ impl VerletIntegration {
         let mut force = kd_tree::Grid2D::new(0.0, 0.0);
         let near = self.kd_tree.neighbor_search(&self.vec2.points[index], self.radius);
         let epsilon2 = self.epsilon * self.epsilon;
-        for i in 0..near.len() {
-            let r_x = self.vec2.points[i].x - self.vec2.points[index].x;
-            let r_y = self.vec2.points[i].y - self.vec2.points[index].y;
+        for i in near.iter() {
+            let r_x = self.vec2.points[*i].x - self.vec2.points[index].x;
+            let r_y = self.vec2.points[*i].y - self.vec2.points[index].y;
             let r = (r_x * r_x + r_y * r_y + epsilon2).sqrt();
             if r > self.epsilon {
                 force.x += r_x / (r * r * r);
                 force.y += r_y / (r * r * r);
             }
         }
-        /*
-        let mut f_center_of_gravity = kd_tree::Grid2D::new(0.0, 0.0);
-        let num_total = self.vec2.points.len();
-        for i in 0..num_total {
-            f_center_of_gravity.x += self.vec2.points[i].x / num_total as f64;
-            f_center_of_gravity.y += self.vec2.points[i].y / num_total as f64;
-        }
-        let r_ix = f_center_of_gravity.x - self.vec2.points[index].x;
-        let r_iy = f_center_of_gravity.y - self.vec2.points[index].y;
-        let d = (r_ix * r_ix + r_iy * r_iy + epsilon2).sqrt();
-        force.x += num_total as f64 * r_ix / (d * d* d);
-        force.y += num_total as f64 * r_iy / (d * d* d);
-        */
         force
     }
 }
