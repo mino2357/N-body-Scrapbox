@@ -27,10 +27,10 @@ impl VerletIntegration {
     }
 
     #[allow(dead_code)]
-    pub fn verlet_integration(&mut self, iter: usize) {
+    pub fn verlet_integration(&mut self, mode: usize) {
         for i in 0..self.vec1.points.len() {
-            self.vec1.points[i].x = 2.0 * self.vec2.points[i].x - self.vec3.points[i].x + self.dt * self.dt * self.gravitation(i, iter).x;
-            self.vec1.points[i].y = 2.0 * self.vec2.points[i].y - self.vec3.points[i].y + self.dt * self.dt * self.gravitation(i, iter).y;
+            self.vec1.points[i].x = 2.0 * self.vec2.points[i].x - self.vec3.points[i].x + self.dt * self.dt * self.gravitation(i, mode).x;
+            self.vec1.points[i].y = 2.0 * self.vec2.points[i].y - self.vec3.points[i].y + self.dt * self.dt * self.gravitation(i, mode).y;
         }
         for i in 0..self.vec1.points.len() {
             self.vec3.points[i].x = self.vec2.points[i].x;
@@ -41,14 +41,45 @@ impl VerletIntegration {
     }
 
     #[allow(dead_code)]
-    pub fn gravitation(&mut self, index: usize, iter: usize) -> kd_tree::Grid2D {
-        let mut force = kd_tree::Grid2D::new(0.0, 0.0);
-        if iter == 0 {
-            self.kd_tree = kd_tree::KDTree::construct_kd_tree(&self.vec2);
+    pub fn verlet_integration_divide(&mut self) {
+        for i in 0..self.vec1.points.len() {
+            self.vec1.points[i].x = 2.0 * self.vec2.points[i].x - self.vec3.points[i].x + self.dt * self.dt * self.gravitation_divide(i).x;
+            self.vec1.points[i].y = 2.0 * self.vec2.points[i].y - self.vec3.points[i].y + self.dt * self.dt * self.gravitation_divide(i).y;
         }
+        for i in 0..self.vec1.points.len() {
+            self.vec3.points[i].x = self.vec2.points[i].x;
+            self.vec3.points[i].y = self.vec2.points[i].y;
+            self.vec2.points[i].x = self.vec1.points[i].x;
+            self.vec2.points[i].y = self.vec1.points[i].y;
+        }
+    }
+
+    #[allow(dead_code)]
+    pub fn gravitation(&mut self, index: usize, mode: usize) -> kd_tree::Grid2D {
+        let mut force = kd_tree::Grid2D::new(0.0, 0.0);
+        let epsilon2 = self.epsilon * self.epsilon;
+        if mode == 0 {
+            for i in 0..self.vec1.points.len() {
+                if index != i {
+                    let r_x = self.vec2.points[i].x - self.vec2.points[index].x;
+                    let r_y = self.vec2.points[i].y - self.vec2.points[index].y;
+                    let r = (r_x * r_x + r_y * r_y + epsilon2).sqrt();
+                    if r > self.epsilon {
+                        force.x += r_x / (r * r * r);
+                        force.y += r_y / (r * r * r);
+                    }
+                }
+            }
+        }
+        force
+    }
+
+    #[allow(dead_code)]
+    pub fn gravitation_divide(&mut self, index: usize) -> kd_tree::Grid2D {
+        let mut force = kd_tree::Grid2D::new(0.0, 0.0);
         let near = self.kd_tree.neighbor_search(&self.vec2.points[index], self.radius);
         let epsilon2 = self.epsilon * self.epsilon;
-        for i in near {
+        for i in 0..near.len() {
             let r_x = self.vec2.points[i].x - self.vec2.points[index].x;
             let r_y = self.vec2.points[i].y - self.vec2.points[index].y;
             let r = (r_x * r_x + r_y * r_y + epsilon2).sqrt();
@@ -57,6 +88,19 @@ impl VerletIntegration {
                 force.y += r_y / (r * r * r);
             }
         }
+        /*
+        let mut f_center_of_gravity = kd_tree::Grid2D::new(0.0, 0.0);
+        let num_total = self.vec2.points.len();
+        for i in 0..num_total {
+            f_center_of_gravity.x += self.vec2.points[i].x / num_total as f64;
+            f_center_of_gravity.y += self.vec2.points[i].y / num_total as f64;
+        }
+        let r_ix = f_center_of_gravity.x - self.vec2.points[index].x;
+        let r_iy = f_center_of_gravity.y - self.vec2.points[index].y;
+        let d = (r_ix * r_ix + r_iy * r_iy + epsilon2).sqrt();
+        force.x += num_total as f64 * r_ix / (d * d* d);
+        force.y += num_total as f64 * r_iy / (d * d* d);
+        */
         force
     }
 }
