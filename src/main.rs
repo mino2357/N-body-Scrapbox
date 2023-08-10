@@ -81,7 +81,7 @@ fn main() {
     let seed: [u8; 32] = [1; 32];
     let mut rng: rand::rngs::StdRng = rand::SeedableRng::from_seed(seed);
 
-    let num_point: usize = 10_000;
+    let num_point: usize = 100_000;
 
     let mut n_body = verlet_integration::VerletIntegration::new();
     n_body.epsilon = 1.0e-2;
