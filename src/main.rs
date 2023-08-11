@@ -12,16 +12,18 @@ mod verlet_integration;
 fn draw_graph(i: usize, vec1: &kd_tree::Points2D) {
     let out_file_name = format!("{:04}", i).to_string() + ".png";
 
-    let root = BitMapBackend::new(&out_file_name, (1440, 1440)).into_drawing_area();
+    let root = BitMapBackend::new(&out_file_name, (2560, 1440)).into_drawing_area();
 
     root.fill(&BLACK).unwrap();
+
+    let scale = 1.0;
 
     let mut chart = ChartBuilder::on(&root)
         //.caption("y=x^2", ("sans-serif", 50).into_font())
         .margin(5)
         .x_label_area_size(30)
         .y_label_area_size(30)
-        .build_cartesian_2d(-2.6..2.6, -2.6..2.6)
+        .build_cartesian_2d((-2.56 * scale)..(2.56 * scale), (-1.44 * scale)..(1.44 * scale))
         .unwrap();
 
     chart.configure_mesh().draw().unwrap();
@@ -81,20 +83,20 @@ fn main() {
     let seed: [u8; 32] = [1; 32];
     let mut rng: rand::rngs::StdRng = rand::SeedableRng::from_seed(seed);
 
-    let num_point: usize = 100_000;
+    let num_point: usize = 25_000;
 
     let mut n_body = verlet_integration::VerletIntegration::new();
-    n_body.epsilon = 1.0e-2;
-    n_body.dt = 1.0e-4;
-    n_body.radius = 1.0e1;
+    n_body.epsilon = 1.0e-1;
+    n_body.dt = 1.0e-5;
+    n_body.radius = 1.0;
 
     loop {
-        let x1_r = 2.0 * (rng.gen::<f64>() - 0.5);
-        let y1_r = 2.0 * (rng.gen::<f64>() - 0.5);
+        let x1_r = 1.0 * 2.0 * (rng.gen::<f64>() - 0.5);
+        let y1_r = 0.7 * 2.0 * (rng.gen::<f64>() - 0.5);
         let v = 1.0 / (x1_r * x1_r + y1_r * y1_r + n_body.epsilon * n_body.epsilon).sqrt();
-        let x2_r = x1_r - 1.0e-2 * v * n_body.dt * y1_r;
-        let y2_r = y1_r + 1.0e-2 * v * n_body.dt * x1_r;
-        if x1_r * x1_r + y1_r * y1_r > 0.5 && x1_r * x1_r + y1_r * y1_r < 0.501 { 
+        let x2_r = x1_r - 1.0e2 * v * n_body.dt * y1_r;
+        let y2_r = y1_r + 1.0e2 * v * n_body.dt * x1_r;
+        if x1_r * x1_r + y1_r * y1_r < 0.7 * 0.7 {
             n_body.vec2.points.push(kd_tree::Grid2D { x: x2_r, y: y2_r });
             n_body.vec3.points.push(kd_tree::Grid2D { x: x1_r, y: y1_r });
         }
@@ -107,14 +109,14 @@ fn main() {
         n_body.vec1.points.push(kd_tree::Grid2D { x: 0.0, y: 0.0 });
     }
 
-    let max_counter = 1000;
-    let interval = 100;
+    let max_counter = 12000;
+    let interval = 1;
 
     for i in 0..max_counter {
         draw_graph(i, &n_body.vec2);
         for _ in 0..interval {
-            //n_body.verlet_integration(0);
-            n_body.verlet_integration_divide();
+            n_body.verlet_integration();
+            //n_body.verlet_integration_divide();
         }
         println!("{} / {}", i, max_counter - 1);
     }
