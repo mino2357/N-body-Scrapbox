@@ -79,6 +79,7 @@ fn gen_apng(num: usize) {
     }
 }
 
+#[allow(dead_code)]
 fn main() {
     let seed: [u8; 32] = [1; 32];
     let mut rng: rand::rngs::StdRng = rand::SeedableRng::from_seed(seed);
