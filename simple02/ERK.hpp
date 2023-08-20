@@ -28,8 +28,25 @@ namespace mino2357{
     template <typename T>
     mino2357::vector<T> func(const mino2357::vector<T>& u){
         auto ret = u;
-        ret.vec[0] = -u.vec[1];
-        ret.vec[1] = u.vec[0];
+        auto num = u.vec.size();
+        auto epsilon = mp::cpp_dec_float_100("0.0");
+        for(size_t i=0; i<num/2; ++i){
+            ret.vec[i] = u.vec[i+num/2];
+        }
+        for(size_t i=num/2; i<num; i+=2){
+            ret.vec[i] = mp::cpp_dec_float_100("0.0");
+            ret.vec[i+1] = mp::cpp_dec_float_100("0.0");
+            for(size_t j=num/2; j<num; j+=2){
+                if(i!=j){
+                    auto x = u.vec[i-num/2] - u.vec[j-num/2];
+                    auto y = u.vec[i+1-num/2] - u.vec[j+1-num/2];;
+                    auto r = mp::sqrt(x*x + y*y + epsilon*epsilon);
+		    //std::cout << r << std::endl;
+                    ret.vec[i] += - x / (r * r * r);
+                    ret.vec[i+1] += - y / (r * r * r);
+                }
+            }
+        }
         return ret;
     }
 
@@ -398,7 +415,7 @@ namespace mino2357{
         delta = mp::sqrt(R);
        
         if(delta > A_Tol){
-            std::cerr << "Retry " << t << " " << dt << std::endl;
+            //std::cerr << "Retry " << t << " " << dt << std::endl;
             dt = crt_h * mp::pow(alpha<T>() * A_Tol / delta, ratio<T>(1, 5));
             return;
         }
