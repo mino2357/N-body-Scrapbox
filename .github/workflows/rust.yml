@@ -24,12 +24,3 @@ jobs:
       run: |
         cd ./simple01
         cargo test --verbose
-
-    - name: Build simple 02
-      run: |
-        cd ./simple02
-        cargo build --verbose
-    - name: Run tests simple 02
-      run: |
-        cd ./simple02
-        cargo build --verbose
