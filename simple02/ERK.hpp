@@ -12,7 +12,7 @@
 
 namespace mp = boost::multiprecision; // for sqrt
 
-using float_mp = mp::number<mp::cpp_dec_float<100>>;
+using float_mp = mp::number<mp::cpp_dec_float<32>>;
 
 namespace mino2357{
 
