@@ -12,7 +12,7 @@
 
 namespace mp = boost::multiprecision; // for sqrt
 
-using float_mp = mp::number<mp::cpp_dec_float<32>>;
+using float_mp = mp::number<mp::cpp_dec_float<50>>;
 
 namespace mino2357{
 
@@ -24,6 +24,11 @@ namespace mino2357{
     template <typename T>
     constexpr T alpha(){
         return static_cast<T>("0.8");
+    }
+
+    template <typename T>
+    constexpr T min_dt(){
+        return static_cast<T>("0.0001");
     }
 
     // f: R^N -> R^N
@@ -429,5 +434,9 @@ namespace mino2357{
         next_h = crt_h * mp::pow(alpha<T>() * A_Tol / delta, ratio<T>(1, 8));
 
         dt = next_h;
+
+	if(dt > min_dt<T>()){
+		dt = min_dt<T>();
+	}
     }
 }
