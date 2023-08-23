@@ -18,9 +18,9 @@ jobs:
     - uses: actions/checkout@v3
     - name: Build simple01
       run: |
-        cd ./simple01
+        cd ./Plummer_model_simple
         cargo build --verbose
     - name: Run tests simple01
       run: |
-        cd ./simple01
+        cd ./Plummer_model_simple
         cargo test --verbose
