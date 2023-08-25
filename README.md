@@ -1,6 +1,6 @@
-# （重力）多体問題の数値実験乗
+# (Gravity) Numerical experiments on N-body problems
 
-重力多体問題の実験場。
+numerical experiment.
 
 ## Plummer model.
 
@@ -16,17 +16,21 @@ N=32.
 
 ## Simple Solar System
 
-orbital eccentricity = 1.0.
+Eccentricity = 0.0.
 
 ![](images/orbit_line.png)
 
+Time evolution of the magnitude of the eccentricity vector.
+
+![](images/orbital_eccentricity.png)
+
 ## Video
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/Zd7TeECvfuI?si=tuA6fdOS88rQLls0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+https://youtu.be/Zd7TeECvfuI?si=wWU6xSPNXU_w81rl
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/eDsN9gEhS4w?si=Yc6hnD80LllEOA-Q" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+https://youtu.be/eDsN9gEhS4w?si=ldrdr02TGHg0cQhq
 
-## 参考文献
+## References
 
 1. [Makino J. (2001), 重力多体系の数値計算](https://repository.kulib.kyoto-u.ac.jp/dspace/bitstream/2433/97012/1/KJ00004711437.pdf)
 2. [Kepler問題におけるKustaanheimo-Stiefel変換](https://osanshouo.github.io/blog/2021/04/12-kustaanheimo-stiefel/)

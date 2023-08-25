@@ -287,8 +287,8 @@ namespace mino2357{
 
         dt = next_h;
 
-	if(dt > min_dt<T>()){
-		dt = min_dt<T>();
+	if(dt > max_dt){
+		dt = max_dt;
 	}
     }
 }
