@@ -39,7 +39,7 @@ int main() {
 		x.vec[i+1] = vel * x.vec[i-num/2];
 	}
 
-	auto tol = float_mp("1.0e-12");
+	auto tol = float_mp("1.0e-9");
 	auto dt = float_mp("1.0e-12");
 	auto intv = float_mp("1.0e-5");
 	auto write_time = float_mp("0.1") * mino2357::min_dt<float_mp>();

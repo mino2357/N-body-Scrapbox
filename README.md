@@ -2,9 +2,29 @@
 
 重力多体問題の実験場。
 
-Plummer model.
+## Plummer model.
+
+![https://youtu.be/eDsN9gEhS4w](images/n_2_24.png)
 
 ![](images/ep_1e-1_n_10000_r_2r2.png)
+
+## Few Body Problem
+
+N=32.
+
+![](images/n_32_res1080.png)
+
+## Simple Solar System
+
+orbital eccentricity = 1.0.
+
+![](images/orbit_line.png)
+
+## Video
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/Zd7TeECvfuI?si=tuA6fdOS88rQLls0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/eDsN9gEhS4w?si=Yc6hnD80LllEOA-Q" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
 ## 参考文献
 

@@ -35,7 +35,7 @@ replot "log2.log" u 59:60 w l
 replot "log2.log" u 61:62 w l
 replot "log2.log" u 63:64 w l
 replot
-set terminal pngcairo size 1080, 1080
+set terminal pngcairo size 20000, 20000
 set output "n_32_res20000.png"
 replot
 set output

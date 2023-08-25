@@ -7,15 +7,12 @@
 #include <string>
 #include <random>
 #include <boost/multiprecision/cpp_dec_float.hpp>
-
 #include "vector.hpp"
+#include "parameter.hpp"
 
 namespace mp = boost::multiprecision; // for sqrt
 
-using float_mp = mp::number<mp::cpp_dec_float<50>>;
-
 namespace mino2357{
-
     template <typename T>
     constexpr T ratio(int a, int b){
         return static_cast<T>(a) / static_cast<T>(b);
@@ -25,151 +22,6 @@ namespace mino2357{
     constexpr T alpha(){
         return static_cast<T>("0.8");
     }
-
-    template <typename T>
-    constexpr T min_dt(){
-        return static_cast<T>("0.00004");
-    }
-
-    // f: R^N -> R^N
-    template <typename T>
-    mino2357::vector<T> func(const mino2357::vector<T>& u){
-        auto ret = u;
-        auto num = u.vec.size();
-        auto epsilon = float_mp("0.0");
-        for(size_t i=0; i<num/2; ++i){
-            ret.vec[i] = u.vec[i+num/2];
-        }
-        for(size_t i=num/2; i<num; i+=2){
-            ret.vec[i] = float_mp("0.0");
-            ret.vec[i+1] = float_mp("0.0");
-            for(size_t j=num/2; j<num; j+=2){
-                if(i!=j){
-                    auto x = u.vec[i-num/2] - u.vec[j-num/2];
-                    auto y = u.vec[i+1-num/2] - u.vec[j+1-num/2];;
-                    auto r = mp::sqrt(x*x + y*y + epsilon*epsilon);
-		    //std::cout << r << std::endl;
-                    ret.vec[i] += - x / (r * r * r);
-                    ret.vec[i+1] += - y / (r * r * r);
-                }
-            }
-        }
-        return ret;
-    }
-
-    template <typename T>
-    class ButcherRKF45{
-    public:
-        T table[6][6];
-        T order5[6];
-        T order6[6];
-        T minus[6];
-
-        constexpr ButcherRKF45();
-
-        constexpr T operator()(int i, int j){
-            return table[i][j];
-        };
-
-        constexpr T o5(int i){
-            return order5[i];
-        };
-        
-        constexpr T o6(int i){
-            return order6[i];
-        };
-
-        constexpr T R(int i){
-            return minus[i];
-        }
-    };
-
-    template <typename T>
-    constexpr ButcherRKF45<T>::ButcherRKF45(){
-        table[0][0] =   ratio<T>(0, 1);
-        table[1][0] =   ratio<T>(1, 4);
-        table[2][0] =   ratio<T>(3, 32);      table[2][1] =   ratio<T>(9, 32);
-        table[3][0] =   ratio<T>(1932, 2197); table[3][1] = - ratio<T>(7200, 2197);  table[3][2] =   ratio<T>(7296, 2197);
-        table[4][0] =   ratio<T>(439, 216);   table[4][1] = - ratio<T>(8, 1);        table[4][2] =   ratio<T>(3680, 513);   table[4][3] = - ratio<T>(845, 4104);
-        table[5][0] = - ratio<T>(8, 27);      table[5][1] =   ratio<T>(2, 1);        table[5][2] = - ratio<T>(3544, 2565);  table[5][3] =   ratio<T>(1859, 4104);  table[5][4] = - ratio<T>(11, 40);
-        
-        order6[0] = ratio<T>(16, 135);      order6[1] =   ratio<T>(0, 1);   order6[2] = ratio<T>(6656, 12825);
-        order6[3] = ratio<T>(28561, 56430); order6[4] = - ratio<T>(9, 50);  order6[5] = ratio<T>(2, 55);
-    
-        order5[0] = ratio<T>(25, 216);      order5[1] =   ratio<T>(0, 1);   order5[2] = ratio<T>(1408, 2565);
-        order5[3] = ratio<T>(2197, 4104);   order5[4] = - ratio<T>(1, 5);   order5[5] = ratio<T>(0, 1);
-
-        minus[0] =   ratio<T>(1, 360);         minus[1] = ratio<T>(0, 1);      minus[2] = - ratio<T>(128, 4275);
-        minus[3] = - ratio<T>(2197, 75240);    minus[4] = ratio<T>(1, 50);     minus[5] =   ratio<T>(2, 55);
-    }
-
-    template <typename T>
-    class RKF45{
-    public:
-        T crt_h;
-        T next_h;
-        T A_Tol;
-        T R_Tol;//今は使わない
-
-        constexpr RKF45(T, T);
-
-        inline constexpr void Integrate(T& ,T&, mino2357::vector<T>&) noexcept;
-    };
-
-    template <typename T>
-    inline constexpr void RKF45<T>::Integrate(T& t, T& dt, mino2357::vector<T>& x) noexcept{
-        crt_h = dt;
-
-        mino2357::vector<T> x5(x.vec.size()), x6(x.vec.size()), temp(x.vec.size());
-        T delta, R;
-
-        R = 0;
-
-        mino2357::vector<T> k0(x.vec.size()), k1(x.vec.size()), k2(x.vec.size()), k3(x.vec.size()), k4(x.vec.size()), k5(x.vec.size());
-
-        ButcherRKF45<T> bf45;
-
-        k0 = func<T>(x);
-        k1 = func<T>(x + crt_h * bf45(1, 0) * k0);
-        k2 = func<T>(x + crt_h * bf45(2, 0) * k0 + crt_h * bf45(2, 1) * k1);
-        k3 = func<T>(x + crt_h * bf45(3, 0) * k0 + crt_h * bf45(3, 1) * k1 + crt_h * bf45(3, 2) * k2);
-        k4 = func<T>(x + crt_h * bf45(4, 0) * k0 + crt_h * bf45(4, 1) * k1 + crt_h * bf45(4, 2) * k2 + crt_h * bf45(4, 3) * k3);
-        k5 = func<T>(x + crt_h * bf45(5, 0) * k0 + crt_h * bf45(5, 1) * k1 + crt_h * bf45(5, 2) * k2 + crt_h * bf45(5, 3) * k3 + crt_h * bf45(5, 4) * k4);
-
-        x5 = x + crt_h * (bf45.o5(0) * k0 + bf45.o5(1) * k1 + bf45.o5(2) * k2 + bf45.o5(3) * k3 + bf45.o5(4) * k4 + bf45.o5(5) * k5);
-        x6 = x + crt_h * (bf45.o6(0) * k0 + bf45.o6(1) * k1 + bf45.o6(2) * k2 + bf45.o6(3) * k3 + bf45.o6(4) * k4 + bf45.o6(5) * k5);
-
-        temp = x5 - x6;
-        
-        for(size_t i=0; i<temp.vec.size(); ++i){
-            R += temp.vec[i] * temp.vec[i];
-        }
-        R = R / crt_h;
-        
-        delta = mp::sqrt(R);
-
-        if(delta > A_Tol){
-            std::cerr << "Retry " << t << " " << dt << std::endl;
-            dt = crt_h * mp::pow(alpha<T>() * A_Tol / delta, ratio<T>(1, 5));
-            return;
-        }
-
-        x = x5;
-        //x = x6;
-        t += crt_h;
-
-        next_h = crt_h * mp::pow(alpha<T>() * A_Tol / delta, ratio<T>(1, 5));
-
-        dt = next_h;
-    }
-
-    template <typename T>
-    constexpr RKF45<T>::RKF45(T at,T rt){
-        A_Tol = at;
-        R_Tol = rt;
-    }
-    
-    /************************************************************************/
     
     template <typename T>
     class ButcherRKF78{
