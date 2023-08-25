@@ -24,3 +24,5 @@ perf.*
 *.log
 
 tmp/
+
+.vscode/

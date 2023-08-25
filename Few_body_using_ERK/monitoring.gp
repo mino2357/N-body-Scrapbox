@@ -1,3 +1,3 @@
-plot 'err_tol-12.log' w lp
+plot 'err_tol-9.log' w lp
 pause 5
 reread

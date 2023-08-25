@@ -1,12 +1,36 @@
-# （重力）多体問題の数値実験乗
+# (Gravity) Numerical experiments on N-body problems
 
-重力多体問題の実験場。
+numerical experiment.
 
-Plummer model.
+## Plummer model.
+
+![https://youtu.be/eDsN9gEhS4w](images/n_2_24.png)
 
 ![](images/ep_1e-1_n_10000_r_2r2.png)
 
-## 参考文献
+## Few Body Problem
+
+N=32.
+
+![](images/n_32_res1080.png)
+
+## Simple Solar System
+
+Eccentricity = 0.0.
+
+![](images/orbit_line.png)
+
+Time evolution of the magnitude of the eccentricity vector.
+
+![](images/orbital_eccentricity.png)
+
+## Video
+
+https://youtu.be/Zd7TeECvfuI?si=wWU6xSPNXU_w81rl
+
+https://youtu.be/eDsN9gEhS4w?si=ldrdr02TGHg0cQhq
+
+## References
 
 1. [Makino J. (2001), 重力多体系の数値計算](https://repository.kulib.kyoto-u.ac.jp/dspace/bitstream/2433/97012/1/KJ00004711437.pdf)
 2. [Kepler問題におけるKustaanheimo-Stiefel変換](https://osanshouo.github.io/blog/2021/04/12-kustaanheimo-stiefel/)
