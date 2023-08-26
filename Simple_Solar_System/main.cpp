@@ -141,8 +141,6 @@ int main() {
 	for(;;){
 		rkf78.Integrate(mino2357::time, mino2357::dt, x);
 		if(mino2357::time > mino2357::write_time){
-			// time dt
-			//std::cerr << mino2357::time / (float_mp("2.0") * float_mp("3.141592653")) << " " << mino2357::dt / (float_mp("2.0") * float_mp("3.141592653")) << std::endl;
 			// position
 			std::cout << mino2357::time / (float_mp("2.0") * float_mp("3.141592653"));
 			for(size_t i=0; i<mino2357::num/2; i+=2){
