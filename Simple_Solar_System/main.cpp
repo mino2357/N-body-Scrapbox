@@ -8,36 +8,37 @@
 
 namespace mp = boost::multiprecision;
 
+//          |  mass      |    r
+//  Sun     |  1.0       |    0.0
+//  Mercury |  1.660e-7  |    0.387
+//  Venus   |  2.447e-6  |    0.723
+//  Eeath   |  3.003e-6  |    1.000
+//  Mars    |  3.226e-7  |    1.524
+//  Jupiter |  9.543e-4  |    5.204
+//  Saturn  |  2.857e-4  |    9.582
+//  Uranus  |  4.365e-5  |   19.201
+//  Neptune |  5.149e-5  |   30.047
+//  X       |  1.000e-9  |  100.0
+//
+std::vector<float_mp> m = {
+	float_mp("1.0"),
+	float_mp("1.660e-7"),
+	float_mp("2.447e-6"),
+	float_mp("3.003e-6"),
+	float_mp("3.226e-7"),
+	float_mp("9.543e-4"),
+	float_mp("2.857e-4"),
+	float_mp("4.365e-5"),
+	float_mp("5.149e-5"),
+	float_mp("1.0e-9")
+};
+
 namespace mino2357 {
     // f: R^N -> R^N
     template <typename T>
     mino2357::vector<T> func(const mino2357::vector<T>& u){
         auto ret = u;
         auto num = u.vec.size();
-	//          |  mass      |    r
-	//  Sun     |  1.0       |    0.0
-	//  Mercury |  1.660e-7  |    0.387
-	//  Venus   |  2.447e-6  |    0.723
-	//  Eeath   |  3.003e-6  |    1.000
-	//  Mars    |  3.226e-7  |    1.524
-	//  Jupiter |  9.543e-4  |    5.204
-	//  Saturn  |  2.857e-4  |    9.582
-	//  Uranus  |  4.365e-5  |   19.201
-	//  Neptune |  5.149e-5  |   30.047
-	//  X       |  1.000e-9  |  100.0
-	//
-	std::vector<T> m = {
-		T("1.0"),
-		T("1.660e-7"),
-		T("2.447e-6"),
-		T("3.003e-6"),
-		T("3.226e-7"),
-		T("9.543e-4"),
-		T("2.857e-4"),
-		T("4.365e-5"),
-		T("5.149e-5"),
-		T("1.0e-9")
-	};
 	for(size_t i=0; i<num/2; ++i){
             ret.vec[i] = u.vec[i+num/2];
         }
@@ -69,6 +70,20 @@ std::tuple<T, T> eccentricity_vector(const T& pos_x, const T& pos_y, const T& ve
 	T ret_x = (v * v / mu - T("1.0") / r) * pos_x - (rv / mu) * vel_x;
 	T ret_y = (v * v / mu - T("1.0") / r) * pos_y - (rv / mu) * vel_y;
 	return {ret_x, ret_y};
+}
+
+template <typename T>
+T angular_momentum(const mino2357::vector<T>& x){
+	auto ret = T("0.0");
+	for(size_t i=0; i<mino2357::num/2; i+=2){
+		auto r_x = x.vec[i];
+		auto r_y = x.vec[i+1];
+		auto v_x = x.vec[i+mino2357::num/2];
+		auto v_y = x.vec[i+mino2357::num/2+1];
+		auto m_m   = m[i/2];
+		ret += r_x * m_m * v_y - r_y * m_m * v_x;
+	}
+	return ret;
 }
 
 int main() {
@@ -129,13 +144,13 @@ int main() {
 			// time dt
 			//std::cerr << mino2357::time / (float_mp("2.0") * float_mp("3.141592653")) << " " << mino2357::dt / (float_mp("2.0") * float_mp("3.141592653")) << std::endl;
 			// position
-			std::cout << mino2357::time;;
+			std::cout << mino2357::time / (float_mp("2.0") * float_mp("3.141592653"));
 			for(size_t i=0; i<mino2357::num/2; i+=2){
 				std::cout << " " << x.vec[i] - x.vec[0] << " " << x.vec[i+1] - x.vec[1];
 			}
 			std::cout << std::endl;
 			// eccentricity_vector
-			std::cerr << mino2357::time;;
+			std::cerr << mino2357::time / (float_mp("2.0") * float_mp("3.141592653"));
 			for(size_t i=2; i<mino2357::num/2; i+=2){
 				auto r_x = x.vec[i] - x.vec[0];
 				auto r_y = x.vec[i+1] - x.vec[1];
@@ -144,7 +159,7 @@ int main() {
 				auto [e_x, e_y] = eccentricity_vector<float_mp>(r_x, r_y, v_x, v_y);
 				std::cerr << " " << mp::sqrt(e_x * e_x + e_y * e_y);
 			}
-			std::cerr << std::endl;
+			std::cerr << " " << angular_momentum<float_mp>(x) - 0.00354046249445236011 << std::endl;
 
 			mino2357::write_time = mino2357::time + mino2357::intv;
 		}
