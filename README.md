@@ -8,21 +8,21 @@ numerical experiment.
 
 ![](images/ep_1e-1_n_10000_r_2r2.png)
 
-## Few Body Problem
-
-N=32.
-
-![](images/n_32_res1080.png)
-
 ## Simple Solar System
 
-Eccentricity = 0.0.
+Eccentricity = 0.0 (t=0).
 
 ![](images/orbit_line.png)
 
 Time evolution of the magnitude of the eccentricity vector.
 
-![](images/orbital_eccentricity.png)
+![](images/e_100k.png)
+
+## Few Body Problem
+
+N=32.
+
+![](images/n_32_res1080.png)
 
 ## Video
 
