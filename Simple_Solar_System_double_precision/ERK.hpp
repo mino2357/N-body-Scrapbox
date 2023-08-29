@@ -6,11 +6,8 @@
 #include <iomanip>
 #include <string>
 #include <random>
-#include <boost/multiprecision/cpp_dec_float.hpp>
 #include "vector.hpp"
 #include "parameter.hpp"
-
-namespace mp = boost::multiprecision; // for sqrt
 
 namespace mino2357{
     template <typename T>
@@ -20,7 +17,7 @@ namespace mino2357{
 
     template <typename T>
     constexpr T alpha(){
-        return static_cast<T>("0.8");
+        return static_cast<T>(0.8);
     }
     
     template <typename T>
@@ -271,11 +268,11 @@ namespace mino2357{
         }
         R = R / crt_h;
 
-        delta = mp::sqrt(R);
+        delta = sqrt(R);
        
         if(delta > A_Tol){
-            //std::cerr << "Retry " << t << " " << dt << std::endl;
-            dt = crt_h * mp::pow(alpha<T>() * A_Tol / delta, ratio<T>(1, 5));
+            //std::cerr << Retry  << t <<   << dt << std::endl;
+            dt = crt_h * pow(alpha<T>() * A_Tol / delta, ratio<T>(1, 5));
             return;
         }
 
@@ -283,7 +280,7 @@ namespace mino2357{
 
         t += crt_h;
         
-        next_h = crt_h * mp::pow(alpha<T>() * A_Tol / delta, ratio<T>(1, 8));
+        next_h = crt_h * pow(alpha<T>() * A_Tol / delta, ratio<T>(1, 8));
 
         dt = next_h;
 
