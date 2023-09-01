@@ -181,23 +181,18 @@ int main() {
 			std::cout << mino2357::time / (float_mp(2.0) * float_mp(PI)) << " "; // (float_mp(2.0) * float_mp(PI));
 			// eccentricity_vector
 			for(size_t i=0; i<mino2357::num/2; i+=3){
-				auto r_x = x.vec[i];
-				auto r_y = x.vec[i+1];
-				auto r_z = x.vec[i+2];
-				//auto v_x = x.vec[i+mino2357::num/2];
-				//auto v_y = x.vec[i+mino2357::num/2+1];
-				//auto v_z = x.vec[i+mino2357::num/2+2];
-				std::cout << r_x << " " << r_y << " " << r_z << " "; // << v_x << " " << v_y << " " << v_z;
-				//auto [e_x, e_y, e_z] = eccentricity_vector<float_mp>(r_x, r_y, r_z, v_x, v_y, v_z);
-				//std::cout << " " << sqrt(e_x * e_x + e_y * e_y + e_z * e_z);
+				auto r_x = x.vec[i] - x.vec[0];
+				auto r_y = x.vec[i+1] - x.vec[1];
+				auto r_z = x.vec[i+2] - x.vec[2];
+				auto v_x = x.vec[i+mino2357::num/2];
+				auto v_y = x.vec[i+mino2357::num/2+1];
+				auto v_z = x.vec[i+mino2357::num/2+2];
+				std::cout << " " << r_x << " " << r_y << " " << r_z << " " << v_x << " " << v_y << " " << v_z;
+				auto [e_x, e_y, e_z] = eccentricity_vector<float_mp>(r_x, r_y, r_z, v_x, v_y, v_z);
+				std::cout << " " << e_x << " " << e_y << " " << e_z << " " << sqrt(e_x * e_x + e_y * e_y + e_z * e_z);
 			}
-			std::cout << std::endl;
-			//auto [l_x, l_y, l_z] = angular_momentum<float_mp>(x);
-			//std::cout << " " << l_x << " " << l_y << " " << l_z << " " << sqrt(l_x*l_x+l_y*l_y+l_z*l_z) << std::endl;
-			//for(size_t i=0; i<mino2357::num; i++){
-			//	std::cerr << x.vec[i] << " ";
-			//}
-			//std::cerr << std::endl;
+			auto [l_x, l_y, l_z] = angular_momentum<float_mp>(x);
+			std::cout << " " << l_x << " " << l_y << " " << l_z << " " << sqrt(l_x*l_x+l_y*l_y+l_z*l_z) << std::endl;
 		}
 	}
 }
