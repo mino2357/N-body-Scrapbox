@@ -1,0 +1,6 @@
+set xlabel "yr"
+set ylabel "angular momentum"
+plot "log.log" u 1:102 w l title "Lx"
+replot "log.log" u 1:103 w l title "Ly"
+replot "log.log" u 1:104 w l title "Lz"
+replot "log.log" u 1:105 w l title "||L||"

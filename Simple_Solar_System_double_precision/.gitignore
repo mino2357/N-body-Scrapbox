@@ -1,0 +1,5 @@
+*.log
+*.out
+main
+log_data/
+exp/
