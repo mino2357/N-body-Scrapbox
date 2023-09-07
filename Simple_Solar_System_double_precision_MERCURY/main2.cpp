@@ -95,47 +95,43 @@ int main() {
 	mino2357::vector<float_mp> x(mino2357::num);
 
 	// position
-	x.vec[0]  = float_mp(0.0);
-	x.vec[1]  = float_mp(0.0);
-	x.vec[2]  = float_mp(0.387);
-	x.vec[3]  = float_mp(0.0);
-	x.vec[4]  = float_mp(0.723);
-	x.vec[5]  = float_mp(0.0);
-	x.vec[6]  = float_mp(1.0000);
-	x.vec[7]  = float_mp(0.0);
-	x.vec[8]  = float_mp(1.524);
-	x.vec[9]  = float_mp(0.0);
-	x.vec[10] = float_mp(5.204);
-	x.vec[11] = float_mp(0.0);
-	x.vec[12] = float_mp(9.582);
-	x.vec[13] = float_mp(0.0);
-	x.vec[14] = float_mp(19.201);
-	x.vec[15] = float_mp(0.0);
-	x.vec[16] = float_mp(30.047);
-	x.vec[17] = float_mp(0.0);
-	//x.vec[18] = float_mp(100.0); // X
-	//x.vec[19] = float_mp(0.0);
+	x.vec[0]  = 0.0074398765048238;
+	x.vec[1]  = 1276.6077709874462016-1276.6077709874462016;
+	x.vec[2]  = 0.2499759936913019;
+	x.vec[3]  = 1276.3066954216913018-1276.6077709874462016;
+	x.vec[4]  = 0.7271321705317847;
+	x.vec[5]  = 1276.5385237578025226-1276.6077709874462016;
+	x.vec[6]  = 0.2631495377279227;
+	x.vec[7]  = 1277.5744188752410082-1276.6077709874462016;
+	x.vec[8]  = 1.4888682816335364;
+	x.vec[9]  = 1276.9633266707101029-1276.6077709874462016;
+	x.vec[10] = 3.9452556448896270;
+	x.vec[11] = 1273.2279515204595555-1276.6077709874462016;
+	x.vec[12] = -6.9940828839135039;
+	x.vec[13] = 1283.0655807505449957-1276.6077709874462016;
+	x.vec[14] = -14.3347275745383183;
+	x.vec[15] = 1264.0509505305199127-1276.6077709874462016;
+	x.vec[16] = 29.3322884234699899;
+	x.vec[17] = 1271.0493297143764266-1276.6077709874462016;
 	// velocity
-	x.vec[18] = float_mp(0.0);
-	x.vec[19] = float_mp(0.0);
-	x.vec[20] = float_mp(0.0);
-	x.vec[21] = float_mp(1.0) / sqrt(x.vec[2]);
-	x.vec[22] = float_mp(0.0);
-	x.vec[23] = float_mp(1.0) / sqrt(x.vec[4]);
-	x.vec[24] = float_mp(0.0);
-	x.vec[25] = float_mp(1.0) / sqrt(x.vec[6]);
-	x.vec[26] = float_mp(0.0);
-	x.vec[27] = float_mp(1.0) / sqrt(x.vec[8]);
-	x.vec[28] = float_mp(0.0);
-	x.vec[29] = float_mp(1.0) / sqrt(x.vec[10]);
-	x.vec[30] = float_mp(0.0);
-	x.vec[31] = float_mp(1.0) / sqrt(x.vec[12]);
-	x.vec[32] = float_mp(0.0);
-	x.vec[33] = float_mp(1.0) / sqrt(x.vec[14]);
-	x.vec[34] = float_mp(0.0);
-	x.vec[35] = float_mp(1.0) / sqrt(x.vec[16]);
-	//x.vec[38] = float_mp(0.0); // X
-	//x.vec[39] = float_mp(1.0) / sqrt(x.vec[18]);
+	x.vec[18] = -0.0002167886536899;
+	x.vec[19] = 0.0002805692567873-0.0002805692567873;
+	x.vec[20] = 1.2581649881840380;
+	x.vec[21] = 1.0030804449583404-0.0002805692567873;
+	x.vec[22] = 0.1125031375554474;
+	x.vec[23] = 1.1708874467951029-0.0002805692567873;
+	x.vec[24] = -0.9669702351836751;
+	x.vec[25] = 0.2563614096027937-0.0002805692567873;
+	x.vec[26] = -0.1897792993285236;
+	x.vec[27] = 0.7880671993199786-0.0002805692567873;
+	x.vec[28] = 0.2867408525432656;
+	x.vec[29] = 0.3332202844588128-0.0002805692567873;
+	x.vec[30] = -0.2196827576200676;
+	x.vec[31] = -0.2379240754311144-0.0002805692567873;
+	x.vec[32] = 0.1503977113592879;
+	x.vec[33] = -0.1725109220249797-0.0002805692567873;
+	x.vec[34] = 0.0355650749990056;
+	x.vec[35] = 0.1801304702798814-0.0002805692567873;
 
 	mino2357::RKF78<float_mp> rkf78(mino2357::tol, mino2357::tol);
 	auto a_m_init = angular_momentum<float_mp>(x);
@@ -164,10 +160,12 @@ int main() {
 				auto [e_x, e_y] = eccentricity_vector<float_mp>(r_x, r_y, v_x, v_y);
 				std::cout << " " << sqrt(e_x * e_x + e_y * e_y);
 			}
-			std::cout << " " << pow(mag_r, 1.5) << std::endl;
-			std::cerr << " " << abs((angular_momentum<float_mp>(x) - a_m_init) / a_m_init) << std::endl;
-
-			mino2357::write_time = mino2357::time + mino2357::intv;
+			std::cout << " " << pow(mag_r, 1.5);
+			std::cout << " " << abs((angular_momentum<float_mp>(x) - a_m_init)) << std::endl;
+			for(size_t i=0; i<mino2357::num; i++){
+				std::cerr << x.vec[i] << " ";
+			}
+			std::cerr << std::endl;
 		}
 	}
 }
