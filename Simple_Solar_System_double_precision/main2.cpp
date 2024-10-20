@@ -10,7 +10,7 @@
 //  Sun     |  1.0       |    0.0
 //  Mercury |  1.660e-7  |    0.387
 //  Venus   |  2.447e-6  |    0.723
-//  Eeath   |  3.003e-6  |    1.000
+//  Earth   |  3.003e-6  |    1.000
 //  Mars    |  3.226e-7  |    1.524
 //  Jupiter |  9.543e-4  |    5.204
 //  Saturn  |  2.857e-4  |    9.582
@@ -46,7 +46,7 @@ namespace mino2357 {
             ret.vec[i+1] = float_mp(0.0);
             for(size_t j=num/2; j<num; j+=2){
                 if(j!=i){
-		    auto m_j = m[(j-num/2)/2];
+				    auto m_j = m[(j-num/2)/2];
                     auto x = u.vec[i-num/2] - u.vec[j-num/2];
                     auto y = u.vec[i+1-num/2] - u.vec[j+1-num/2];;
                     auto r = sqrt(x*x + y*y);
@@ -62,7 +62,7 @@ namespace mino2357 {
 
 template <typename T>
 inline std::tuple<T, T> eccentricity_vector(const T& pos_x, const T& pos_y, const T& vel_x, const T& vel_y) noexcept {
-        T r = sqrt(pos_x * pos_x + pos_y * pos_y);
+	T r = sqrt(pos_x * pos_x + pos_y * pos_y);
 	T v = sqrt(vel_x * vel_x + vel_y * vel_y);
 	T mu = T(1.0);
 	T rv = pos_x * vel_x + pos_y * vel_y;
@@ -140,6 +140,7 @@ int main() {
 
 	for(size_t i=0;;i++){
 		rkf78.Integrate(mino2357::time, mino2357::dt, x);
+		/*
 		if(i%mino2357::intv == 0){
 			// position
 			std::cout << mino2357::time / (float_mp(2.0) * float_mp(3.141592653));
@@ -148,13 +149,13 @@ int main() {
 			}
 			std::cout << std::endl;
 			// velocity
-			/*
-			std::cout << mino2357::time / (float_mp(2.0) * float_mp(3.141592653));
-			for(size_t i=mino2357::num/2; i<mino2357::num; i+=2){
-				std::cout << " " << x.vec[i] - x.vec[0] << " " << x.vec[i+1] - x.vec[1];
-			}
-			std::cout << std::endl;
-			*/
+			
+			//std::cout << mino2357::time / (float_mp(2.0) * float_mp(3.141592653));
+			//for(size_t i=mino2357::num/2; i<mino2357::num; i+=2){
+			//	std::cout << " " << x.vec[i] - x.vec[0] << " " << x.vec[i+1] - x.vec[1];
+			//}
+			//std::cout << std::endl;
+			
 			// eccentricity_vector
 			std::cerr << mino2357::time / (float_mp(2.0) * float_mp(3.141592653));
 			for(size_t i=2; i<mino2357::num/2; i+=2){
@@ -168,6 +169,10 @@ int main() {
 			std::cerr << " " << abs((angular_momentum<float_mp>(x) - a_m_init) / a_m_init) << std::endl;
 
 			mino2357::write_time = mino2357::time + mino2357::intv;
+		}
+		*/
+		if(mino2357::time > 1.0){
+			break;
 		}
 	}
 }

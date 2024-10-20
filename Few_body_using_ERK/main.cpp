@@ -44,22 +44,25 @@ int main() {
 	auto intv = float_mp("1.0e-5");
 	auto write_time = float_mp("0.1") * mino2357::min_dt<float_mp>();
 	auto time = float_mp("0.0");
-	auto end_time = float_mp("1.0e2");
+	auto end_time = float_mp("1.0e-3");
 	mino2357::RKF78<float_mp> rkf78(tol, tol);
 
 	for(;;){
 		rkf78.Integrate(time, dt, x);
-		if(time > write_time){
+		//if(time > write_time){
+			/*
 			std::cerr << time << " " << angular_momentum(x) << std::endl;
 		
 			for(size_t i=0; i<num/2; i++){
 				std::cout << x.vec[i] << " ";
 			}
 			std::cout << std::endl;
-			write_time = time + intv;
-		}
+			*/
+			//write_time = time + intv;
+		//}
 		if(time > end_time) {
 			break;
 		}
 	}
+	std::cout << "finished" << std::endl;
 }
