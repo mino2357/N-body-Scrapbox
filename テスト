@@ -1,0 +1,2129 @@
+```html
+<!DOCTYPE html>
+<html lang="ja" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ピタゴラス3体問題 — 10種数値積分スキーム比較 (1次〜13次)</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter, JetBrains Mono, Noto Sans JP -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Inter"', '"Noto Sans JP"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            space: {
+              950: '#050811',
+              900: '#0a0f1f',
+              800: '#121a30',
+              700: '#1c2745',
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    html, body {
+      overscroll-behavior: none;
+      touch-action: manipulation;
+      background-color: #050811;
+      color: #e2e8f0;
+    }
+    canvas {
+      touch-action: none;
+      display: block;
+    }
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      background: transparent;
+      cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-runnable-track {
+      height: 6px;
+      border-radius: 999px;
+      background: #1c2745;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #38bdf8;
+      margin-top: -6px;
+      box-shadow: 0 0 8px rgba(56, 189, 248, 0.65);
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0a0f1f;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1c2745;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-sky-500/30">
+
+  <!-- 実行時エラー通知バナー -->
+  <div id="error-banner" class="hidden bg-rose-950/95 border-b border-rose-500/60 text-rose-200 px-3 py-2 text-xs font-mono"></div>
+
+  <!-- ヘッダーバー -->
+  <header class="bg-space-900/90 backdrop-blur-md border-b border-slate-800/80 px-3 py-2 sticky top-0 z-20">
+    <div class="max-w-6xl mx-auto flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2 min-w-0">
+        <div id="status-led" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0"></div>
+        <h1 class="text-sm sm:text-base font-bold tracking-tight text-slate-100 truncate">
+          ピタゴラス3体問題 <span class="text-xs font-mono font-normal text-sky-400 ml-1">1次〜13次 比較</span>
+        </h1>
+      </div>
+      <div class="flex items-center gap-1.5 shrink-0">
+        <button id="btn-open-bench" type="button"
+          class="text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-sky-500/20 hover:bg-sky-500/30 active:scale-95 text-sky-300 border border-sky-500/40 transition flex items-center gap-1">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+          </svg>
+          <span>10スキーム一括比較</span>
+        </button>
+        <button id="btn-open-modal" type="button"
+          class="text-xs font-medium px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 border border-slate-700/80 transition flex items-center gap-1">
+          <svg class="w-3.5 h-3.5 text-amber-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+          </svg>
+          <span class="hidden sm:inline">数理・スキーム解説</span>
+          <span class="sm:hidden">解説</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- メインコンテンツ -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-3 py-2 flex flex-col gap-2">
+
+    <!-- ライブテレメトリ（物理量・NFE・誤差診断パネル） -->
+    <section aria-label="シミュレーション統計" class="grid grid-cols-2 sm:grid-cols-5 gap-1.5 sm:gap-2">
+      <!-- 時刻 t -->
+      <div class="bg-space-900 border border-slate-800/90 rounded-xl px-2.5 py-1.5 flex flex-col justify-between">
+        <div class="flex items-center justify-between gap-1">
+          <span class="text-[10px] sm:text-[11px] text-slate-400">無次元時刻 <i class="font-serif">t</i></span>
+          <span id="event-badge" class="text-[9px] px-1.5 py-0.5 rounded bg-sky-500/15 text-sky-300 font-medium truncate">計算中</span>
+        </div>
+        <div id="stat-time" class="font-mono text-sm sm:text-base font-bold text-slate-100 mt-0.5">0.000</div>
+      </div>
+
+      <!-- 累積力評価回数 NFE -->
+      <div class="bg-space-900 border border-slate-800/90 rounded-xl px-2.5 py-1.5 flex flex-col justify-between">
+        <div class="flex items-center justify-between gap-1">
+          <span class="text-[10px] sm:text-[11px] text-slate-400">力評価回数 (NFE)</span>
+          <span id="stat-nfe-rate" class="text-[9px] font-mono text-slate-400">0 /t</span>
+        </div>
+        <div id="stat-nfe" class="font-mono text-sm sm:text-base font-bold text-emerald-400 mt-0.5">0</div>
+      </div>
+
+      <!-- 相対エネルギー誤差 -->
+      <div class="bg-space-900 border border-slate-800/90 rounded-xl px-2.5 py-1.5 flex flex-col justify-between">
+        <span class="text-[10px] sm:text-[11px] text-slate-400">相対エネルギー誤差 |ΔE/E₀|</span>
+        <div id="stat-energy-err" class="font-mono text-sm sm:text-base font-bold text-cyan-300 mt-0.5">0.00e+0</div>
+      </div>
+
+      <!-- 現在の刻み幅 h -->
+      <div class="bg-space-900 border border-slate-800/90 rounded-xl px-2.5 py-1.5 flex flex-col justify-between">
+        <div class="flex items-center justify-between gap-1">
+          <span class="text-[10px] sm:text-[11px] text-slate-400">現在の刻み幅 <i class="font-serif">h</i></span>
+          <span id="stat-order-tag" class="text-[9px] font-mono px-1 rounded bg-slate-800 text-amber-300">p=5</span>
+        </div>
+        <div id="stat-dt" class="font-mono text-sm sm:text-base font-bold text-amber-300 mt-0.5">1.00e-3</div>
+      </div>
+
+      <!-- ステップ (採択 / 棄却) -->
+      <div class="col-span-2 sm:col-span-1 bg-space-900 border border-slate-800/90 rounded-xl px-2.5 py-1.5 flex flex-col justify-between">
+        <span class="text-[10px] sm:text-[11px] text-slate-400">ステップ (採択 / 棄却)</span>
+        <div class="font-mono text-xs sm:text-sm font-semibold text-slate-100 mt-0.5">
+          <span id="stat-accepted" class="text-slate-100">0</span>
+          <span class="text-slate-500 mx-0.5">/</span>
+          <span id="stat-rejected" class="text-rose-400">0</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- キャンバス領域 -->
+    <section class="relative w-full h-[44vh] min-h-[260px] max-h-[520px] bg-space-950 border border-slate-800 rounded-2xl overflow-hidden shadow-inner">
+      <canvas id="sim-canvas" class="w-full h-full"></canvas>
+
+      <!-- 凡例オーバーレイ (左上) -->
+      <div class="absolute top-2.5 left-2.5 bg-space-900/80 backdrop-blur-sm border border-slate-800/80 rounded-xl px-2.5 py-1.5 text-[11px] pointer-events-none flex flex-col gap-1">
+        <div class="flex items-center gap-1.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-[#38bdf8] inline-block shadow-[0_0_6px_#38bdf8]"></span>
+          <span class="text-slate-200 font-medium">質点1 (<span class="font-mono">m₁=3</span>)</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-[#fbbf24] inline-block shadow-[0_0_6px_#fbbf24]"></span>
+          <span class="text-slate-200 font-medium">質点2 (<span class="font-mono">m₂=4</span>)</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-[#fb7185] inline-block shadow-[0_0_6px_#fb7185]"></span>
+          <span class="text-slate-200 font-medium">質点3 (<span class="font-mono">m₃=5</span>)</span>
+        </div>
+      </div>
+
+      <!-- オートズーム・視点リセット (右上) -->
+      <div class="absolute top-2.5 right-2.5 flex flex-col items-end gap-1">
+        <div class="flex items-center gap-1.5">
+          <button id="btn-auto-zoom" type="button"
+            class="bg-sky-500/20 hover:bg-sky-500/30 active:scale-95 backdrop-blur-sm text-sky-300 text-xs px-2.5 py-1.5 rounded-xl border border-sky-500/40 shadow transition flex items-center gap-1">
+            <span id="dot-auto-zoom" class="w-2 h-2 rounded-full bg-sky-400"></span>
+            <span>オートズーム</span>
+          </button>
+          <button id="btn-reset-view" type="button"
+            class="bg-space-900/85 hover:bg-slate-800 active:scale-95 backdrop-blur-sm text-slate-200 text-xs px-2.5 py-1.5 rounded-xl border border-slate-700/80 shadow transition flex items-center gap-1">
+            <svg class="w-3.5 h-3.5 text-sky-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+            </svg>
+            <span>視点リセット</span>
+          </button>
+        </div>
+        <span class="text-[10px] text-slate-400 bg-space-900/75 px-2 py-0.5 rounded-md pointer-events-none">
+          1本指ドラッグ移動 / 2本指ピンチズーム
+        </span>
+      </div>
+
+      <!-- 選択中のスキームバッジ＆エネルギー表示 (左下) -->
+      <div class="absolute bottom-2.5 left-2.5 right-2.5 flex flex-wrap items-center justify-between gap-1.5 pointer-events-none">
+        <div class="bg-space-900/85 backdrop-blur-sm border border-slate-800/80 rounded-lg px-2.5 py-1 text-[10px] font-mono text-slate-300">
+          E = <span id="stat-total-energy">-12.816667</span> <span class="text-slate-400">(E₀ = -769/60)</span>
+        </div>
+        <div id="canvas-scheme-badge" class="bg-space-900/85 backdrop-blur-sm border border-sky-500/30 rounded-lg px-2.5 py-1 text-[10px] font-mono text-sky-300">
+          5次: Dormand-Prince 5(4) [DOPRI5]
+        </div>
+      </div>
+    </section>
+
+    <!-- コントロールパネル -->
+    <section aria-label="操作パネル" class="bg-space-900 border border-slate-800 rounded-2xl p-3 flex flex-col gap-2.5">
+      <!-- スキーム選択 ＆ 許容誤差選択 -->
+      <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
+        <div class="sm:col-span-7 flex flex-col gap-1">
+          <div class="flex items-center justify-between text-xs">
+            <label for="select-scheme" class="text-slate-300 font-semibold">積分スキーム (1次〜13次・10種類)</label>
+            <span id="scheme-type-hint" class="text-[10px] font-mono text-sky-400">埋込型RK / 適応刻み</span>
+          </div>
+          <select id="select-scheme"
+            class="w-full bg-slate-800 border border-slate-700 text-slate-100 text-xs sm:text-sm rounded-xl px-2.5 py-2 font-mono focus:outline-none focus:border-sky-500">
+            <option value="euler1">1次: Forward Euler (陽的オイラー / 固定極小刻み)</option>
+            <option value="verlet2">2次: Velocity Verlet (シンプレクティック2次 / 固定刻み)</option>
+            <option value="bs23">3次: Bogacki-Shampine 3(2) [BS23 / 適応刻み]</option>
+            <option value="yoshida4">4次: Yoshida 4th Symplectic (吉田4次 / 固定刻み)</option>
+            <option value="dopri5" selected>5次: Dormand-Prince 5(4) [DOPRI5 / 適応刻み]</option>
+            <option value="dverk6">6次: Verner 6(5) [DVERK / 適応刻み]</option>
+            <option value="rkf78">7次: Fehlberg 7(8) [RKF78 / 適応刻み]</option>
+            <option value="dop853">8次: Dormand-Prince 8(5,3) [DOP853 / 適応刻み]</option>
+            <option value="gl10">10次: Gauss-Legendre 5段陰的RK [GL10 / シンプレクティック]</option>
+            <option value="gbs13">13次: Gragg-Bulirsch-Stoer外挿法 [GBS-13 / 適応次数]</option>
+          </select>
+        </div>
+
+        <div class="sm:col-span-5 flex flex-col gap-1">
+          <div class="flex items-center justify-between text-xs">
+            <label for="select-tol" class="text-slate-300 font-semibold">許容誤差 (rtol = atol)</label>
+            <span id="tol-status-hint" class="text-[10px] text-slate-400">適応制御有効</span>
+          </div>
+          <select id="select-tol"
+            class="w-full bg-slate-800 border border-slate-700 text-slate-100 text-xs sm:text-sm rounded-xl px-2.5 py-2 font-mono focus:outline-none focus:border-sky-500">
+            <option value="1e-6">1e-6 (粗い・高速比較用)</option>
+            <option value="1e-8">1e-8 (標準精度)</option>
+            <option value="1e-10">1e-10 (高精度)</option>
+            <option value="1e-11" selected>1e-11 (推奨・高安定)</option>
+            <option value="1e-13">1e-13 (超高精度・高次向け)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 再生・リセット・軌跡・現在値ログ記録ボタン行 -->
+      <div class="grid grid-cols-4 gap-1.5 sm:gap-2">
+        <button id="btn-play-pause" type="button"
+          class="col-span-1 py-2 px-2 rounded-xl font-semibold text-xs sm:text-sm bg-amber-400 hover:bg-amber-300 active:scale-[0.98] text-slate-950 shadow-lg shadow-amber-500/20 transition flex items-center justify-center gap-1">
+          <svg id="icon-play" class="w-4 h-4 hidden shrink-0" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+          <svg id="icon-pause" class="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+          </svg>
+          <span id="label-play-pause">停止</span>
+        </button>
+
+        <button id="btn-reset-sim" type="button"
+          class="col-span-1 py-2 px-2 rounded-xl font-medium text-xs sm:text-sm bg-slate-800 hover:bg-slate-700 active:scale-[0.98] text-slate-200 border border-slate-700 transition flex items-center justify-center gap-1">
+          <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+          </svg>
+          <span>リセット</span>
+        </button>
+
+        <button id="btn-trail-mode" type="button"
+          class="col-span-1 py-2 px-2 rounded-xl font-medium text-xs sm:text-sm bg-slate-800 hover:bg-slate-700 active:scale-[0.98] text-slate-200 border border-slate-700 transition flex items-center justify-center gap-1">
+          <span id="dot-trail-mode" class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
+          <span id="label-trail-mode" class="truncate">軌跡: 全履歴</span>
+        </button>
+
+        <button id="btn-record-snapshot" type="button"
+          class="col-span-1 py-2 px-2 rounded-xl font-semibold text-xs sm:text-sm bg-emerald-500/20 hover:bg-emerald-500/30 active:scale-[0.98] text-emerald-300 border border-emerald-500/40 transition flex items-center justify-center gap-1">
+          <span>+ 結果記録</span>
+        </button>
+      </div>
+
+      <!-- 時刻ジャンプ & 進行速度スライダー -->
+      <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 pt-1.5 border-t border-slate-800/80 items-center">
+        <!-- 時刻ジャンプ -->
+        <div class="sm:col-span-7 flex items-center gap-1.5 overflow-x-auto pb-0.5">
+          <span class="text-[11px] text-slate-400 shrink-0 font-medium">時刻ジャンプ:</span>
+          <button type="button" data-jump="15.8"
+            class="btn-jump shrink-0 text-[11px] font-mono px-2 py-1 rounded-lg bg-slate-800/90 hover:bg-slate-700 active:scale-95 text-sky-300 border border-slate-700/80 transition">
+            t=15.8 近接1
+          </button>
+          <button type="button" data-jump="45.0"
+            class="btn-jump shrink-0 text-[11px] font-mono px-2 py-1 rounded-lg bg-slate-800/90 hover:bg-slate-700 active:scale-95 text-slate-200 border border-slate-700/80 transition">
+            t=45.0 中盤
+          </button>
+          <button type="button" data-jump="60.0"
+            class="btn-jump shrink-0 text-[11px] font-mono px-2 py-1 rounded-lg bg-slate-800/90 hover:bg-slate-700 active:scale-95 text-amber-300 border border-slate-700/80 transition">
+            t=60.0 脱出開始
+          </button>
+          <button type="button" data-jump="70.0"
+            class="btn-jump shrink-0 text-[11px] font-mono px-2 py-1 rounded-lg bg-slate-800/90 hover:bg-slate-700 active:scale-95 text-rose-300 border border-slate-700/80 transition">
+            t=70.0 連星分離
+          </button>
+        </div>
+
+        <!-- 進行速度スライダー -->
+        <div class="sm:col-span-5 flex items-center gap-2">
+          <label for="slider-speed" class="text-[11px] text-slate-300 shrink-0 font-medium">進行速度:</label>
+          <input id="slider-speed" type="range" min="0.010" max="0.300" step="0.005" value="0.100" class="flex-1 py-1">
+          <span id="label-speed" class="font-mono text-xs text-sky-400 font-semibold w-11 text-right">0.100</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 10スキーム一括ベンチマーク比較モーダル -->
+  <div id="bench-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-2.5 sm:p-5">
+    <div class="bg-space-900 border border-slate-700 rounded-2xl max-w-5xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+      <!-- モーダルヘッダ -->
+      <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between bg-space-950/70">
+        <div>
+          <h2 class="text-sm sm:text-base font-bold text-slate-100">10種数値積分スキーム 精度・評価回数(NFE)ベンチマーク</h2>
+          <p class="text-[11px] text-slate-400">13次 GBS外挿法 (<span class="font-mono">tol=1e-13</span>) を参照解として位置誤差・エネルギー誤差・力評価回数を比較します．</p>
+        </div>
+        <button id="btn-close-bench" type="button" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- ベンチマーク操作バー -->
+      <div class="px-4 py-2.5 bg-space-950/40 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2">
+        <div class="flex flex-wrap items-center gap-2">
+          <label for="bench-target-t" class="text-xs text-slate-300 font-medium">到達時刻:</label>
+          <select id="bench-target-t" class="bg-slate-800 border border-slate-700 text-slate-100 text-xs rounded-lg px-2 py-1.5 font-mono">
+            <option value="20.0">t = 20.0 (第1近接通過後)</option>
+            <option value="45.0">t = 45.0 (多重近接カオス領域)</option>
+            <option value="65.0" selected>t = 65.0 (m₁脱出・連星分離後)</option>
+          </select>
+
+          <label for="bench-tol" class="text-xs text-slate-300 font-medium">適応tol:</label>
+          <select id="bench-tol" class="bg-slate-800 border border-slate-700 text-slate-100 text-xs rounded-lg px-2 py-1.5 font-mono">
+            <option value="1e-8">1e-8</option>
+            <option value="1e-10" selected>1e-10</option>
+            <option value="1e-12">1e-12</option>
+          </select>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button id="btn-clear-bench" type="button"
+            class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs border border-slate-700 transition">
+            履歴クリア
+          </button>
+          <button id="btn-run-batch-bench" type="button"
+            class="px-3.5 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 active:scale-95 text-slate-950 font-bold text-xs shadow-lg shadow-sky-500/20 transition flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            <span>全10スキーム一括計測を実行</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 進捗バー -->
+      <div id="bench-progress-wrap" class="hidden px-4 py-2 bg-space-950 border-b border-slate-800">
+        <div class="flex justify-between text-[11px] font-mono text-sky-300 mb-1">
+          <span id="bench-progress-label">計測準備中...</span>
+          <span id="bench-progress-pct">0%</span>
+        </div>
+        <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+          <div id="bench-progress-bar" class="h-full bg-sky-400 transition-all duration-150" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <!-- 比較テーブル -->
+      <div class="flex-1 overflow-auto p-3 sm:p-4">
+        <div class="overflow-x-auto rounded-xl border border-slate-800">
+          <table class="w-full text-left border-collapse text-xs font-mono">
+            <thead>
+              <tr class="bg-space-950 text-slate-400 border-b border-slate-800 text-[11px]">
+                <th class="py-2.5 px-2.5 font-sans font-semibold">スキーム名</th>
+                <th class="py-2.5 px-2 text-center">次数</th>
+                <th class="py-2.5 px-2 text-right">到達 <i class="font-serif">t</i></th>
+                <th class="py-2.5 px-2.5 text-right text-emerald-400">力評価回数 (NFE)</th>
+                <th class="py-2.5 px-2.5 text-right text-cyan-300">相対誤差 |ΔE/E₀|</th>
+                <th class="py-2.5 px-2.5 text-right text-amber-300">位置誤差 ||Δr||₂</th>
+                <th class="py-2.5 px-2 text-right">計算時間</th>
+              </tr>
+            </thead>
+            <tbody id="bench-table-body" class="divide-y divide-slate-800/80 text-slate-200">
+              <tr>
+                <td colspan="7" class="py-8 text-center font-sans text-slate-400">
+                  「全10スキーム一括計測を実行」を押すか，メイン画面の「+ 結果記録」で現在の計算結果を追加してください．
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- モーダルフッタ -->
+      <div class="px-4 py-2.5 border-t border-slate-800 bg-space-950/70 flex items-center justify-between text-[11px] text-slate-400">
+        <span>※ 1次Euler法はカオス近接遭遇により散乱角が乖離するため，位置誤差が大きくなる様子を確認できます．</span>
+        <button id="btn-close-bench-footer" type="button"
+          class="px-4 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-100 font-semibold text-xs transition">
+          閉じる
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 数理モデル・10スキーム詳細解説モーダル -->
+  <div id="math-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-2.5 sm:p-5">
+    <div class="bg-space-900 border border-slate-700 rounded-2xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between bg-space-950/60">
+        <h2 class="text-sm sm:text-base font-bold text-slate-100">数理モデルおよび10種の数値積分スキーム詳細</h2>
+        <button id="btn-close-modal" type="button" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="p-4 sm:p-5 overflow-y-auto text-xs sm:text-sm text-slate-300 leading-relaxed space-y-4">
+        <div>
+          <h3 class="text-sky-400 font-bold mb-1">1. ピタゴラス3体問題（ブラウの問題）の定式化</h3>
+          <p>
+            辺長比 <span class="font-mono text-slate-100">3 : 4 : 5</span> の直角三角形の各頂点に質量 <span class="font-mono">m₁=3, m₂=4, m₃=5</span> を初速度ゼロで配置する古典3体問題です（<span class="font-mono">G = 1</span>，初期全エネルギー <span class="font-mono">E₀ = -769/60 ≈ -12.816667</span>）．<span class="font-mono">t ≈ 15.8</span> や <span class="font-mono">t ≈ 59.4</span> で極めて近い2体近接遭遇が発生するため，低次法では軌道の分岐先が誤りやすく，高次適応法による厳密な誤差制御が不可欠となります．
+          </p>
+        </div>
+
+        <div>
+          <h3 class="text-sky-400 font-bold mb-1.5">2. 実装した10種類の数値積分スキーム（1次〜13次）</h3>
+          <div class="space-y-2 text-xs">
+            <div class="bg-space-950 border border-slate-800 rounded-xl p-2.5">
+              <div class="font-bold text-slate-100">1次: Forward Euler（陽的オイラー法 / 固定刻み h = 2×10⁻⁴）</div>
+              <p class="text-slate-400 mt-0.5">1段陽的法（1 NFE/step）．シンプレクティック性を持たずエネルギーが単調増加し，軌道が早期に破綻します．</p>
+            </div>
+            <div class="bg-space-950 border border-slate-800 rounded-xl p-2.5">
+              <div class="font-bold text-slate-100">2次: Velocity Verlet（ベロシティ・ベルレ法 / 固定刻み h = 5×10⁻⁴）</div>
+              <p class="text-slate-400 mt-0.5">2次シンプレクティック積分法（FSALにより実質 1 NFE/step）．ハミルトニアンの長期ドリフトを抑えますが，固定刻みのため超近接遭遇で位相誤差が生じます．</p>
+            </div>
+            <div class="bg-space-950 border border-slate-800 rounded-xl p-2.5">
+              <div class="font-bold text-slate-100">3次: Bogacki-Shampine 3(2) [BS23 / 適応刻み]</div>
+              <p class="text-slate-400 mt-0.5">4段埋込型ルンゲ・クッタ法（FSALにより実質 3 NFE/step）．MATLABの <span class="font-mono">ode23</span> に採用されている3次法です．</p>
+            </div>
+            <div class="bg-space-950 border border-slate-800 rounded-xl p-2.5">
+              <div class="font-bold text-slate-100">4次: Yoshida 4th-Order Symplectic（吉田4次シンプレクティック法 / 固定刻み h = 8×10⁻⁴）</div>
+              <p class="text-slate-400 mt-0.5">2次リープフロッグの3重合成（係数 <span class="font-mono">w₁ = 1/(2 - 2^(1/3)), w₀ = -2^(1/3)/(2 - 2^(1/3))</span>，3 NFE/step）による4次シンプレクティック法です．</p>
+            </div>
+            <div class="bg-space-950 border border-slate-800 rounded-xl p-2.5">
+              <div class="font-bold text-slate-100">5次: Dormand-Prince 5(4) [DOPRI5 / 適応刻み]</div>
+              <p class="text-slate-400 mt-0.5">7段埋込型RK法（FSALにより実質 6 NFE/step）．誤差最小化係数とFSAL特性により中〜高精度領域で高い効率を発揮します．</p>
+            </div>
+            <div class="bg-space-950 border border-slate-800 rounded-xl p-2.5">
+              <div class="font-bold text-slate-100">6次: Verner 6(5) [DVERK / 適応刻み]</div>
+              <p class="text-slate-400 mt-0.5">8段埋込型6次ルンゲ・クッタ法（8 NFE/step）．6次精度主解と5次埋め込み解の差分で刻み幅を制御します．</p>
+            </div>
+            <div class="bg-space-950 border border-slate-800 rounded-xl p-2.5">
+              <div class="font-bold text-slate-100">7次: Fehlberg 7(8) [RKF78 / 適応刻み]</div>
+              <p class="text-slate-400 mt-0.5">13段埋込型7(8)次ルンゲ・クッタ法（13 NFE/step）．NASAのアポロ計画や天体力学の軌道計算で標準的に使われてきた古典的高次法です．</p>
+            </div>
+            <div class="bg-space-950 border border-slate-800 rounded-xl p-2.5">
+              <div class="font-bold text-slate-100">8次: Dormand-Prince 8(5,3) [DOP853 / 適応刻み]</div>
+              <p class="text-slate-400 mt-0.5">Hairer-Nørsett-Wanner による12段埋込型8次RK法（12 NFE/step）．5次と3次の2重誤差推定器を備え，<span class="font-mono">tol ≤ 10⁻¹⁰</span> で極めて少ないNFEを達成します．</p>
+            </div>
+            <div class="bg-space-950 border border-slate-800 rounded-xl p-2.5">
+              <div class="font-bold text-slate-100">10次: Gauss-Legendre 5段陰的RK法 [GL10 / 適応刻み]</div>
+              <p class="text-slate-400 mt-0.5">5次ルジャンドル多項式の根を分点とする5段コロケーション陰的ルンゲ・クッタ法（最高次 <span class="font-mono">2s = 10</span>）．シンプレクティック性とA-安定性を併せ持ち，不動点反復で機械精度まで収束させます．</p>
+            </div>
+            <div class="bg-space-950 border border-slate-800 rounded-xl p-2.5">
+              <div class="font-bold text-slate-100">13次: Gragg-Bulirsch-Stoer外挿法 [GBS-13 / 適応次数・適応刻み]</div>
+              <p class="text-slate-400 mt-0.5">Graggの修正中点法（時間反転対称）の刻み幅列 <span class="font-mono">nⱼ = 2, 4, 6, 8, 12, 16</span> に対してNeville-Aitken多項式外挿を行い，1回の巨大ステップで最高13次〜14次精度に到達します．</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="px-4 py-2.5 border-t border-slate-800 bg-space-950/60 flex justify-end">
+        <button id="btn-close-modal-footer" type="button"
+          class="px-4 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-semibold text-xs sm:text-sm transition">
+          閉じる
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * ピタゴラス3体問題 (Burrau's Problem) — 10種数値積分スキーム比較シミュレータ
+     * 1次(Euler) 〜 13次(Gragg-Bulirsch-Stoer外挿法) まで実装
+     */
+    document.addEventListener('DOMContentLoaded', () => {
+      'use strict';
+
+      const errorBanner = document.getElementById('error-banner');
+      function reportError(err) {
+        console.error(err);
+        if (errorBanner) {
+          errorBanner.textContent = '実行エラー: ' + (err && err.message ? err.message : String(err));
+          errorBanner.classList.remove('hidden');
+        }
+      }
+
+      try {
+        // ==========================================
+        // 1. 物理定数および初期条件
+        // ==========================================
+        const G = 1.0;
+        const MASSES = [3.0, 4.0, 5.0];
+        const BODY_COLORS = ['#38bdf8', '#fbbf24', '#fb7185'];
+        const E0 = -769.0 / 60.0; // -12.816666666666666
+
+        function getInitialState() {
+          return new Float64Array([
+            1.0,  3.0,   // m1 = 3
+           -2.0, -1.0,   // m2 = 4
+            1.0, -1.0,   // m3 = 5
+            0.0,  0.0,
+            0.0,  0.0,
+            0.0,  0.0
+          ]);
+        }
+
+        // グローバル力評価カウンタ (Number of Function Evaluations)
+        let nfeCount = 0;
+
+        /**
+         * 12次元状態ベクトル y の時間微分 dy/dt を計算する（1回呼ばれるごとに nfeCount を +1）
+         */
+        function computeDerivatives(y, dydt) {
+          nfeCount++;
+          dydt[0] = y[6];  dydt[1] = y[7];
+          dydt[2] = y[8];  dydt[3] = y[9];
+          dydt[4] = y[10]; dydt[5] = y[11];
+
+          let ax1 = 0.0, ay1 = 0.0;
+          let ax2 = 0.0, ay2 = 0.0;
+          let ax3 = 0.0, ay3 = 0.0;
+
+          // (1, 2)
+          let dx = y[2] - y[0];
+          let dy = y[3] - y[1];
+          let r2 = dx * dx + dy * dy;
+          let invR3 = G / (r2 * Math.sqrt(r2));
+          ax1 += MASSES[1] * dx * invR3;
+          ay1 += MASSES[1] * dy * invR3;
+          ax2 -= MASSES[0] * dx * invR3;
+          ay2 -= MASSES[0] * dy * invR3;
+
+          // (1, 3)
+          dx = y[4] - y[0];
+          dy = y[5] - y[1];
+          r2 = dx * dx + dy * dy;
+          invR3 = G / (r2 * Math.sqrt(r2));
+          ax1 += MASSES[2] * dx * invR3;
+          ay1 += MASSES[2] * dy * invR3;
+          ax3 -= MASSES[0] * dx * invR3;
+          ay3 -= MASSES[0] * dy * invR3;
+
+          // (2, 3)
+          dx = y[4] - y[2];
+          dy = y[5] - y[3];
+          r2 = dx * dx + dy * dy;
+          invR3 = G / (r2 * Math.sqrt(r2));
+          ax2 += MASSES[2] * dx * invR3;
+          ay2 += MASSES[2] * dy * invR3;
+          ax3 -= MASSES[1] * dx * invR3;
+          ay3 -= MASSES[1] * dy * invR3;
+
+          dydt[6]  = ax1; dydt[7]  = ay1;
+          dydt[8]  = ax2; dydt[9]  = ay2;
+          dydt[10] = ax3; dydt[11] = ay3;
+        }
+
+        /**
+         * 位置のみから3質点の加速度 [ax1, ay1, ax2, ay2, ax3, ay3] を計算する（シンプレクティック法用）
+         */
+        function computeAccelerationsOnly(y, acc) {
+          nfeCount++;
+          let ax1 = 0.0, ay1 = 0.0;
+          let ax2 = 0.0, ay2 = 0.0;
+          let ax3 = 0.0, ay3 = 0.0;
+
+          let dx = y[2] - y[0];
+          let dy = y[3] - y[1];
+          let r2 = dx * dx + dy * dy;
+          let invR3 = G / (r2 * Math.sqrt(r2));
+          ax1 += MASSES[1] * dx * invR3;
+          ay1 += MASSES[1] * dy * invR3;
+          ax2 -= MASSES[0] * dx * invR3;
+          ay2 -= MASSES[0] * dy * invR3;
+
+          dx = y[4] - y[0];
+          dy = y[5] - y[1];
+          r2 = dx * dx + dy * dy;
+          invR3 = G / (r2 * Math.sqrt(r2));
+          ax1 += MASSES[2] * dx * invR3;
+          ay1 += MASSES[2] * dy * invR3;
+          ax3 -= MASSES[0] * dx * invR3;
+          ay3 -= MASSES[0] * dy * invR3;
+
+          dx = y[4] - y[2];
+          dy = y[5] - y[3];
+          r2 = dx * dx + dy * dy;
+          invR3 = G / (r2 * Math.sqrt(r2));
+          ax2 += MASSES[2] * dx * invR3;
+          ay2 += MASSES[2] * dy * invR3;
+          ax3 -= MASSES[1] * dx * invR3;
+          ay3 -= MASSES[1] * dy * invR3;
+
+          acc[0] = ax1; acc[1] = ay1;
+          acc[2] = ax2; acc[3] = ay2;
+          acc[4] = ax3; acc[5] = ay3;
+        }
+
+        function computeTotalEnergy(y) {
+          const v1Sq = y[6] * y[6] + y[7] * y[7];
+          const v2Sq = y[8] * y[8] + y[9] * y[9];
+          const v3Sq = y[10] * y[10] + y[11] * y[11];
+          const T = 0.5 * (MASSES[0] * v1Sq + MASSES[1] * v2Sq + MASSES[2] * v3Sq);
+
+          const r12 = Math.hypot(y[2] - y[0], y[3] - y[1]);
+          const r13 = Math.hypot(y[4] - y[0], y[5] - y[1]);
+          const r23 = Math.hypot(y[4] - y[2], y[5] - y[3]);
+          const U = -G * (
+            (MASSES[0] * MASSES[1]) / r12 +
+            (MASSES[0] * MASSES[2]) / r13 +
+            (MASSES[1] * MASSES[2]) / r23
+          );
+          return T + U;
+        }
+
+        // ==========================================
+        // 2. 10種類の積分スキーム メタデータ定義
+        // ==========================================
+        const SCHEMES = {
+          euler1:   { id: 'euler1',   order: 1,  short: '1次 Euler',      name: '1次: Forward Euler (陽的オイラー)',       type: '固定極小刻み (h=2e-4)', adaptive: false, fixedDt: 2e-4 },
+          verlet2:  { id: 'verlet2',  order: 2,  short: '2次 Verlet',     name: '2次: Velocity Verlet (シンプレクティック)', type: '固定刻み / FSAL (h=5e-4)', adaptive: false, fixedDt: 5e-4 },
+          bs23:     { id: 'bs23',     order: 3,  short: '3次 BS23',       name: '3次: Bogacki-Shampine 3(2) [BS23]',       type: '埋込型RK / FSAL 適応刻み', adaptive: true },
+          yoshida4: { id: 'yoshida4', order: 4,  short: '4次 Yoshida',    name: '4次: Yoshida 4th Symplectic (吉田4次)',    type: '固定刻み / 3重合成 (h=8e-4)', adaptive: false, fixedDt: 8e-4 },
+          dopri5:   { id: 'dopri5',   order: 5,  short: '5次 DOPRI5',     name: '5次: Dormand-Prince 5(4) [DOPRI5]',       type: '埋込型RK / FSAL 適応刻み', adaptive: true },
+          dverk6:   { id: 'dverk6',   order: 6,  short: '6次 Verner6(5)', name: '6次: Verner 6(5) [DVERK]',                type: '8段埋込型RK / 適応刻み', adaptive: true },
+          rkf78:    { id: 'rkf78',    order: 7,  short: '7次 RKF78',      name: '7次: Fehlberg 7(8) [RKF78]',              type: '13段埋込型RK / 適応刻み', adaptive: true },
+          dop853:   { id: 'dop853',   order: 8,  short: '8次 DOP853',     name: '8次: Dormand-Prince 8(5,3) [DOP853]',     type: '12段埋込型RK / 適応刻み', adaptive: true },
+          gl10:     { id: 'gl10',     order: 10, short: '10次 GL10陰的',  name: '10次: Gauss-Legendre 5段陰的RK [GL10]',   type: '5段陰的シンプレクティック', adaptive: true },
+          gbs13:    { id: 'gbs13',    order: 13, short: '13次 GBS-13',    name: '13次: Gragg-Bulirsch-Stoer外挿法 [GBS-13]', type: '修正中点+多項式外挿 (最高13次)', adaptive: true }
+        };
+
+        // ==========================================
+        // 3. 汎用埋込型ルンゲ・クッタ係数テーブル (BS23, DOPRI5, DVERK6, RKF78, DOP853)
+        // ==========================================
+        // 3次: Bogacki-Shampine 3(2) (4段, FSAL)
+        const TABLE_BS23 = {
+          s: 4, p: 3, fsal: true,
+          a: [
+            [],
+            [1/2],
+            [0, 3/4],
+            [2/9, 1/3, 4/9]
+          ],
+          b: [2/9, 1/3, 4/9, 0],
+          e: [2/9 - 7/24, 1/3 - 1/4, 4/9 - 1/3, -1/8]
+        };
+
+        // 5次: Dormand-Prince 5(4) (7段, FSAL)
+        const TABLE_DOPRI5 = {
+          s: 7, p: 5, fsal: true,
+          a: [
+            [],
+            [1/5],
+            [3/40, 9/40],
+            [44/45, -56/15, 32/9],
+            [19372/6561, -25360/2187, 64448/6561, -212/729],
+            [9017/3168, -355/33, 46732/5247, 49/176, -5103/18656],
+            [35/384, 0, 500/1113, 125/192, -2187/6784, 11/84]
+          ],
+          b: [35/384, 0, 500/1113, 125/192, -2187/6784, 11/84, 0],
+          e: [
+            35/384 - 5179/57600,
+            0,
+            500/1113 - 7571/16695,
+            125/192 - 393/640,
+            -2187/6784 - (-92097/339200),
+            11/84 - 187/2100,
+            -1/40
+          ]
+        };
+
+        // 6次: Verner 6(5) (8段)
+        const TABLE_DVERK6 = {
+          s: 8, p: 6, fsal: false,
+          a: [
+            [],
+            [1/6],
+            [4/75, 16/75],
+            [5/6, -8/3, 5/2],
+            [-165/64, 55/6, -425/64, 85/96],
+            [12/5, -8, 4015/612, -11/36, 88/255],
+            [-8263/15000, 124/75, -643/680, -81/250, 2484/10625, 0],
+            [3501/1720, -300/43, 297275/52632, -319/2322, 24068/84065, 0, 3850/26703]
+          ],
+          b: [3/40, 0, 875/2244, 23/72, 264/1955, 0, 125/11592, 43/616],
+          e: [
+            3/40 - 13/160,
+            0,
+            875/2244 - 2375/5984,
+            23/72 - 5/16,
+            264/1955 - 12/85,
+            0 - 3/44,
+            125/11592 - 0,
+            43/616 - 0
+          ]
+        };
+
+        // 7次: Fehlberg 7(8) (13段)
+        const TABLE_RKF78 = {
+          s: 13, p: 7, fsal: false,
+          a: [
+            [],
+            [2/27],
+            [1/36, 1/12],
+            [1/24, 0, 1/8],
+            [5/12, 0, -25/16, 25/16],
+            [1/20, 0, 0, 1/4, 1/5],
+            [-25/108, 0, 0, 125/108, -65/27, 125/54],
+            [31/300, 0, 0, 0, 61/225, -2/9, 13/900],
+            [2, 0, 0, -53/6, 704/45, -107/9, 67/90, 3],
+            [-91/108, 0, 0, 23/108, -976/135, 311/54, -19/60, 17/6, -1/12],
+            [2383/4100, 0, 0, -341/164, 4496/1025, -301/82, 2133/4100, 45/82, 45/164, 18/41],
+            [3/205, 0, 0, 0, 0, -6/41, -3/205, -3/41, 3/41, 6/41, 0],
+            [-1777/4100, 0, 0, -341/164, 4496/1025, -289/82, 2193/4100, 51/82, 33/164, 12/41, 0, 1]
+          ],
+          b: [41/840, 0, 0, 0, 0, 34/105, 9/35, 9/35, 9/280, 9/280, 41/840, 0, 0],
+          e: [
+            41/840 - 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0, 0,
+            41/840 - 0,
+            -41/840,
+            -41/840
+          ]
+        };
+
+        // 8次: Dormand-Prince 8(5,3) (Hairer, Nørsett & Wanner, 12段)
+        const TABLE_DOP853 = {
+          s: 12, p: 8, fsal: false,
+          a: [
+            [],
+            [0.526001519587677318785587544488e-1],
+            [0.197250569845378994544595329183e-1, 0.591751709536136983633785987549e-1],
+            [0.295875854768068491816892993775e-1, 0.0, 0.887627564304205475450678981324e-1],
+            [0.241365134159266685502369798665e+0, 0.0, -0.884549479328286085344864962717e+0, 0.924836436597378513770572814662e+0],
+            [0.370370370370370370370370370370e-1, 0.0, 0.0, 0.170828608729473871279604482173e+0, 0.125467687566822425016691814123e+0],
+            [0.37109375e-1, 0.0, 0.0, 0.170252211019544039314978060272e+0, 0.602165389804559606850219397283e-1, -0.17578125e-1],
+            [0.370920001185047927108779319836e-1, 0.0, 0.0, 0.170383925712239993810214054705e+0, 0.107262030446373284651809199168e+0, -0.153194377486244017527936158236e-1, 0.827378916381402288758473766002e-2],
+            [0.624110958716075717114429577812e+0, 0.0, 0.0, -0.336089262944694129446859163426e+1, -0.868219346841726006818189891453e+0, 0.275920996994467083049415600797e+2, 0.201540675504778934086186788979e+2, -0.434898841810699588477366255144e+2],
+            [0.477662536438264365890433908527e+0, 0.0, 0.0, -0.248811461997166764192642586468e+1, -0.590290826836842996371446475743e+0, 0.212300514481811942347288949897e+2, 0.152792336328824235832596922938e+2, -0.332882109689848629194453265587e+2, -0.203312017085086261358222928593e-1],
+            [-0.937142430085987325717040216580e+0, 0.0, 0.0, 0.518637242884406370830023853209e+1, 0.109143734899672957818500254654e+1, -0.814978701074692612513997267357e+1, -0.185200656599969598641566180701e+2, 0.227394870993505042818970056734e+2, 0.249360555267965238987089396762e+1, -0.304676447189821950038236690220e+1],
+            [0.227331014751653820792359768449e+1, 0.0, 0.0, -0.105344954667372501984066689879e+2, -0.200087205822486249909675718444e+1, -0.179589318631187989172765950534e+2, 0.279488845294199600508499808837e+2, -0.285899827713502369474065508674e+1, -0.887285693353062954433549289258e+1, 0.123605671757943030647266201528e+2, 0.643392746015763530355970484046e+0]
+          ],
+          b: [
+            0.542937341165687622380535766363e-1, 0.0, 0.0, 0.0, 0.0,
+            0.445031289275240888144113950566e+1,
+            0.189151789931450038304281599044e+1,
+            -0.580120396001058478146721142270e+1,
+            0.311164366957819894408916062370e+0,
+            -0.152160949662516078556178806805e+0,
+            0.201365400804030348374776537501e+0,
+            0.447106157277725905176885569043e-1
+          ],
+          // 8次解 b_i と 5次埋込解 b*_i の差
+          e: [
+            0.542937341165687622380535766363e-1 - 0.1312004499419488073250102996e-1,
+            0.0, 0.0, 0.0, 0.0,
+            0.445031289275240888144113950566e+1 - (-0.1225156446376204440720569753e+1),
+            0.189151789931450038304281599044e+1 - (-0.4957589496572501915214079952e+0),
+            -0.580120396001058478146721142270e+1 - 0.1664377182454986536961530415e+1,
+            0.311164366957819894408916062370e+0 - (-0.3503288487499736816886487290e+0),
+            -0.152160949662516078556178806805e+0 - 0.3341791187130174790297318841e+0,
+            0.201365400804030348374776537501e+0 - 0.8192320648511571246570742613e-1,
+            0.447106157277725905176885569043e-1 - (-0.2235530786388629525884427845e-1)
+          ]
+        };
+
+        const RK_TABLES = {
+          bs23: TABLE_BS23,
+          dopri5: TABLE_DOPRI5,
+          dverk6: TABLE_DVERK6,
+          rkf78: TABLE_RKF78,
+          dop853: TABLE_DOP853
+        };
+
+        // ==========================================
+        // 4. 10次 Gauss-Legendre 5段陰的ルンゲ・クッタ係数 (Order 2s = 10)
+        // ==========================================
+        // 5次ルジャンドル多項式 P5(2c-1)=0 の厳密な求積点 c_i と重み b_i
+        const GL10_C = [
+          0.5 - Math.sqrt(245 + 14 * Math.sqrt(70)) / 42,
+          0.5 - Math.sqrt(245 - 14 * Math.sqrt(70)) / 42,
+          0.5,
+          0.5 + Math.sqrt(245 - 14 * Math.sqrt(70)) / 42,
+          0.5 + Math.sqrt(245 + 14 * Math.sqrt(70)) / 42
+        ];
+        const GL10_B = [
+          (322 - 13 * Math.sqrt(70)) / 1800,
+          (322 + 13 * Math.sqrt(70)) / 1800,
+          64 / 225,
+          (322 + 13 * Math.sqrt(70)) / 1800,
+          (322 - 13 * Math.sqrt(70)) / 1800
+        ];
+        // コロケーション条件 a_{ij} = \int_0^{c_i} L_j(tau) dtau を数値積分(ガウス求積)で機械精度構築
+        const GL10_A = (() => {
+          const A = Array.from({ length: 5 }, () => new Float64Array(5));
+          for (let i = 0; i < 5; i++) {
+            const ci = GL10_C[i];
+            for (let j = 0; j < 5; j++) {
+              // [0, ci] 上の 5点ガウス・ルジャンドル求積で 4次ラグランジュ基底多項式 L_j(t) を厳密積分
+              let sum = 0.0;
+              for (let q = 0; q < 5; q++) {
+                const t = ci * GL10_C[q];
+                let lj = 1.0;
+                for (let m = 0; m < 5; m++) {
+                  if (m !== j) lj *= (t - GL10_C[m]) / (GL10_C[j] - GL10_C[m]);
+                }
+                sum += GL10_B[q] * lj;
+              }
+              A[i][j] = ci * sum;
+            }
+          }
+          return A;
+        })();
+
+        // ==========================================
+        // 5. ソルバ状態クラス（メイン画面とベンチマークで独立インスタンス化可能）
+        // ==========================================
+        function createSolverSession(schemeId, tolVal) {
+          return {
+            schemeId,
+            tol: tolVal,
+            state: getInitialState(),
+            simTime: 0.0,
+            dt: SCHEMES[schemeId].adaptive ? 1e-3 : SCHEMES[schemeId].fixedDt,
+            acceptedSteps: 0,
+            rejectedSteps: 0,
+            // FSAL用キャッシュ
+            hasCachedDeriv: false,
+            cachedDeriv: new Float64Array(12),
+            cachedAcc: new Float64Array(6),
+            // RK作業バッファ (最大13段)
+            K: Array.from({ length: 13 }, () => new Float64Array(12)),
+            yTemp: new Float64Array(12),
+            yNext: new Float64Array(12),
+            yHalf: new Float64Array(12),
+            acc1: new Float64Array(6),
+            acc2: new Float64Array(6),
+            // 陰的RK用ステージバッファ
+            Z: Array.from({ length: 5 }, () => new Float64Array(12)),
+            KZ: Array.from({ length: 5 }, () => new Float64Array(12)),
+            // GBS-13外挿用バッファ
+            gbsSeq: [2, 4, 6, 8, 12, 16],
+            gbsTableau: Array.from({ length: 6 }, () => new Float64Array(12)),
+            gbsY0: new Float64Array(12),
+            gbsY1: new Float64Array(12),
+            gbsY2: new Float64Array(12),
+            gbsDydt: new Float64Array(12)
+          };
+        }
+
+        // ==========================================
+        // 6. 各積分スキームの 1ステップ前進実装
+        // ==========================================
+
+        /**
+         * 1次: Forward Euler
+         */
+        function stepEuler1(sess, maxLimit) {
+          const h = Math.min(SCHEMES.euler1.fixedDt, maxLimit);
+          computeDerivatives(sess.state, sess.K[0]);
+          for (let i = 0; i < 12; i++) {
+            sess.state[i] += h * sess.K[0][i];
+          }
+          sess.dt = h;
+          sess.simTime += h;
+          sess.acceptedSteps++;
+          return h;
+        }
+
+        /**
+         * 2次: Velocity Verlet (FSAL)
+         */
+        function stepVerlet2(sess, maxLimit) {
+          const h = Math.min(SCHEMES.verlet2.fixedDt, maxLimit);
+          const y = sess.state;
+          if (!sess.hasCachedDeriv) {
+            computeAccelerationsOnly(y, sess.cachedAcc);
+            sess.hasCachedDeriv = true;
+          }
+          const a = sess.cachedAcc;
+          const halfH = 0.5 * h;
+          const halfH2 = 0.5 * h * h;
+
+          // 位置更新 r(t+h) = r(t) + v(t)h + 0.5 a(t)h^2
+          for (let i = 0; i < 6; i++) {
+            y[i] += y[i + 6] * h + a[i] * halfH2;
+          }
+          // 新位置で加速度評価 a(t+h)
+          computeAccelerationsOnly(y, sess.acc1);
+          // 速度更新 v(t+h) = v(t) + 0.5 (a(t) + a(t+h)) h
+          for (let i = 0; i < 6; i++) {
+            y[i + 6] += (a[i] + sess.acc1[i]) * halfH;
+          }
+          sess.cachedAcc.set(sess.acc1);
+          sess.dt = h;
+          sess.simTime += h;
+          sess.acceptedSteps++;
+          return h;
+        }
+
+        /**
+         * 4次: Yoshida 4th-Order Symplectic (3重リープフロッグ合成)
+         */
+        const YOSHIDA_CBRT2 = Math.cbrt(2.0);
+        const YOSHIDA_W1 = 1.0 / (2.0 - YOSHIDA_CBRT2);
+        const YOSHIDA_W0 = -YOSHIDA_CBRT2 / (2.0 - YOSHIDA_CBRT2);
+        const YOSHIDA_C = [
+          0.5 * YOSHIDA_W1,
+          0.5 * (YOSHIDA_W1 + YOSHIDA_W0),
+          0.5 * (YOSHIDA_W0 + YOSHIDA_W1),
+          0.5 * YOSHIDA_W1
+        ];
+        const YOSHIDA_D = [YOSHIDA_W1, YOSHIDA_W0, YOSHIDA_W1];
+
+        function stepYoshida4(sess, maxLimit) {
+          const h = Math.min(SCHEMES.yoshida4.fixedDt, maxLimit);
+          const y = sess.state;
+          const acc = sess.acc1;
+
+          // Drift 1
+          for (let i = 0; i < 6; i++) y[i] += YOSHIDA_C[0] * h * y[i + 6];
+          // Kick 1
+          computeAccelerationsOnly(y, acc);
+          for (let i = 0; i < 6; i++) y[i + 6] += YOSHIDA_D[0] * h * acc[i];
+
+          // Drift 2
+          for (let i = 0; i < 6; i++) y[i] += YOSHIDA_C[1] * h * y[i + 6];
+          // Kick 2
+          computeAccelerationsOnly(y, acc);
+          for (let i = 0; i < 6; i++) y[i + 6] += YOSHIDA_D[1] * h * acc[i];
+
+          // Drift 3
+          for (let i = 0; i < 6; i++) y[i] += YOSHIDA_C[2] * h * y[i + 6];
+          // Kick 3
+          computeAccelerationsOnly(y, acc);
+          for (let i = 0; i < 6; i++) y[i + 6] += YOSHIDA_D[2] * h * acc[i];
+
+          // Drift 4
+          for (let i = 0; i < 6; i++) y[i] += YOSHIDA_C[3] * h * y[i + 6];
+
+          sess.dt = h;
+          sess.simTime += h;
+          sess.acceptedSteps++;
+          return h;
+        }
+
+        /**
+         * 汎用埋込型ルンゲ・クッタ 1ステップ (3次 BS23, 5次 DOPRI5, 6次 DVERK6, 7次 RKF78, 8次 DOP853)
+         */
+        function stepEmbeddedRK(sess, table, maxLimit) {
+          const fac = 0.9;
+          const facMin = 0.2;
+          const facMax = 5.0;
+          const hMin = 1e-14;
+          const s = table.s;
+          const expOrder = 1.0 / (table.p);
+
+          if (table.fsal && !sess.hasCachedDeriv) {
+            computeDerivatives(sess.state, sess.K[0]);
+            sess.hasCachedDeriv = true;
+          }
+
+          let guard = 0;
+          while (guard++ < 400) {
+            let h = Math.min(sess.dt, maxLimit);
+            if (h < hMin) h = hMin;
+
+            if (!table.fsal) {
+              computeDerivatives(sess.state, sess.K[0]);
+            }
+
+            // Stage 2 .. s
+            for (let stage = 1; stage < s; stage++) {
+              const aRow = table.a[stage];
+              for (let i = 0; i < 12; i++) {
+                let sum = 0.0;
+                for (let j = 0; j < stage; j++) {
+                  const aij = aRow[j];
+                  if (aij !== 0.0) sum += aij * sess.K[j][i];
+                }
+                sess.yTemp[i] = sess.state[i] + h * sum;
+              }
+              computeDerivatives(sess.yTemp, sess.K[stage]);
+            }
+
+            // 高次主解 yNext の合成
+            for (let i = 0; i < 12; i++) {
+              let sum = 0.0;
+              for (let j = 0; j < s; j++) {
+                const bj = table.b[j];
+                if (bj !== 0.0) sum += bj * sess.K[j][i];
+              }
+              sess.yNext[i] = sess.state[i] + h * sum;
+            }
+
+            // 誤差ノルム評価
+            let errSqSum = 0.0;
+            for (let i = 0; i < 12; i++) {
+              let errSum = 0.0;
+              for (let j = 0; j < s; j++) {
+                const ej = table.e[j];
+                if (ej !== 0.0) errSum += ej * sess.K[j][i];
+              }
+              const errComp = h * errSum;
+              const scale = sess.tol + sess.tol * Math.max(Math.abs(sess.state[i]), Math.abs(sess.yNext[i]));
+              const ratio = errComp / scale;
+              errSqSum += ratio * ratio;
+            }
+            const errNorm = Math.sqrt(errSqSum / 12.0);
+
+            let factor = errNorm === 0.0 ? facMax : fac * Math.pow(1.0 / errNorm, expOrder);
+            factor = Math.min(facMax, Math.max(facMin, factor));
+
+            if (errNorm <= 1.0 || h <= hMin) {
+              sess.state.set(sess.yNext);
+              if (table.fsal) {
+                sess.K[0].set(sess.K[s - 1]);
+              }
+              sess.simTime += h;
+              sess.acceptedSteps++;
+              if (h === sess.dt || factor < 1.0) {
+                sess.dt = h * factor;
+              }
+              return h;
+            } else {
+              sess.rejectedSteps++;
+              sess.dt = h * Math.min(1.0, factor);
+            }
+          }
+          return 0.0;
+        }
+
+        /**
+         * 10次: 5段 Gauss-Legendre 陰的ルンゲ・クッタ法 (Order 10)
+         * 単一ステップ(h) と 半分刻み2ステップ(h/2 + h/2) のリチャードソン外挿/誤差推定により適応制御
+         */
+        function gl10SingleStep(yIn, h, yOut, Z, KZ, iterTol) {
+          computeDerivatives(yIn, KZ[0]);
+          // 初期予測 Z_i = yIn + h * c_i * f(yIn)
+          for (let s = 0; s < 5; s++) {
+            const hc = h * GL10_C[s];
+            for (let i = 0; i < 12; i++) {
+              Z[s][i] = yIn[i] + hc * KZ[0][i];
+            }
+          }
+
+          let converged = false;
+          for (let iter = 0; iter < 18; iter++) {
+            for (let s = 0; s < 5; s++) {
+              computeDerivatives(Z[s], KZ[s]);
+            }
+            let maxDiff = 0.0;
+            for (let s = 0; s < 5; s++) {
+              const aRow = GL10_A[s];
+              for (let i = 0; i < 12; i++) {
+                const newVal = yIn[i] + h * (
+                  aRow[0] * KZ[0][i] + aRow[1] * KZ[1][i] + aRow[2] * KZ[2][i] + aRow[3] * KZ[3][i] + aRow[4] * KZ[4][i]
+                );
+                const diff = Math.abs(newVal - Z[s][i]) / (1.0 + Math.abs(newVal));
+                if (diff > maxDiff) maxDiff = diff;
+                Z[s][i] = newVal;
+              }
+            }
+            if (maxDiff < iterTol) {
+              converged = true;
+              break;
+            }
+          }
+
+          // 最終ステージ導関数評価
+          for (let s = 0; s < 5; s++) {
+            computeDerivatives(Z[s], KZ[s]);
+          }
+          for (let i = 0; i < 12; i++) {
+            yOut[i] = yIn[i] + h * (
+              GL10_B[0] * KZ[0][i] + GL10_B[1] * KZ[1][i] + GL10_B[2] * KZ[2][i] + GL10_B[3] * KZ[3][i] + GL10_B[4] * KZ[4][i]
+            );
+          }
+          return converged;
+        }
+
+        function stepGL10(sess, maxLimit) {
+          const hMin = 1e-13;
+          const iterTol = Math.min(1e-14, sess.tol * 0.01);
+          let guard = 0;
+
+          while (guard++ < 200) {
+            let h = Math.min(sess.dt, maxLimit);
+            if (h < hMin) h = hMin;
+
+            const okFull = gl10SingleStep(sess.state, h, sess.yTemp, sess.Z, sess.KZ, iterTol);
+            if (!okFull && h > hMin) {
+              sess.rejectedSteps++;
+              sess.dt = h * 0.4;
+              continue;
+            }
+
+            // ステップ倍加（h/2 を2回）による10次誤差推定
+            const halfH = 0.5 * h;
+            const okH1 = gl10SingleStep(sess.state, halfH, sess.yHalf, sess.Z, sess.KZ, iterTol);
+            const okH2 = okH1 ? gl10SingleStep(sess.yHalf, halfH, sess.yNext, sess.Z, sess.KZ, iterTol) : false;
+
+            if ((!okH1 || !okH2) && h > hMin) {
+              sess.rejectedSteps++;
+              sess.dt = h * 0.4;
+              continue;
+            }
+
+            // 10次誤差ノルム: (yNext - yTemp) / (2^10 - 1)
+            let errSqSum = 0.0;
+            const denom = 1023.0; // 2^10 - 1
+            for (let i = 0; i < 12; i++) {
+              const errComp = (sess.yNext[i] - sess.yTemp[i]) / denom;
+              const scale = sess.tol + sess.tol * Math.max(Math.abs(sess.state[i]), Math.abs(sess.yNext[i]));
+              const ratio = errComp / scale;
+              errSqSum += ratio * ratio;
+            }
+            const errNorm = Math.sqrt(errSqSum / 12.0);
+
+            let factor = errNorm === 0.0 ? 3.0 : 0.9 * Math.pow(1.0 / errNorm, 1.0 / 11.0);
+            factor = Math.min(3.0, Math.max(0.25, factor));
+
+            if (errNorm <= 1.0 || h <= hMin) {
+              // 局所外挿 (11次精度相当の補正値) を採用
+              for (let i = 0; i < 12; i++) {
+                sess.state[i] = sess.yNext[i] + (sess.yNext[i] - sess.yTemp[i]) / denom;
+              }
+              sess.simTime += h;
+              sess.acceptedSteps++;
+              if (h === sess.dt || factor < 1.0) {
+                sess.dt = h * factor;
+              }
+              return h;
+            } else {
+              sess.rejectedSteps++;
+              sess.dt = h * Math.min(1.0, factor);
+            }
+          }
+          return 0.0;
+        }
+
+        /**
+         * 13次: Gragg-Bulirsch-Stoer (GBS-13) 外挿法
+         * Graggの修正中点法 + Neville-Aitken 多項式外挿 (k=0..5 -> 次数 2k+1 = 1, 3, 5, 7, 9, 11 -> 外挿完了で13次精度)
+         */
+        function modifiedMidpoint(yStart, fStart, H, nSub, yOut, y0, y1, y2, dydt) {
+          const h = H / nSub;
+          const h2 = 2.0 * h;
+
+          y0.set(yStart);
+          for (let i = 0; i < 12; i++) {
+            y1[i] = y0[i] + h * fStart[i];
+          }
+
+          for (let m = 1; m < nSub; m++) {
+            computeDerivatives(y1, dydt);
+            for (let i = 0; i < 12; i++) {
+              y2[i] = y0[i] + h2 * dydt[i];
+            }
+            y0.set(y1);
+            y1.set(y2);
+          }
+
+          // Graggの平滑化最終段
+          computeDerivatives(y1, dydt);
+          for (let i = 0; i < 12; i++) {
+            yOut[i] = 0.5 * (y0[i] + y1[i] + h * dydt[i]);
+          }
+        }
+
+        function stepGBS13(sess, maxLimit) {
+          const hMin = 1e-13;
+          const kMax = 6; // n_j = 2, 4, 6, 8, 12, 16 (6列外挿で最大13次精度)
+          const seq = sess.gbsSeq;
+          const T = sess.gbsTableau;
+
+          computeDerivatives(sess.state, sess.K[0]);
+
+          let guard = 0;
+          while (guard++ < 250) {
+            let H = Math.min(sess.dt, maxLimit);
+            if (H < hMin) H = hMin;
+
+            let accepted = false;
+            let usedK = 0;
+            let lastErrNorm = 1.0;
+
+            for (let k = 0; k < kMax; k++) {
+              // T[k] に分割数 seq[k] の修正中点結果を格納
+              modifiedMidpoint(
+                sess.state, sess.K[0], H, seq[k],
+                T[k], sess.gbsY0, sess.gbsY1, sess.gbsY2, sess.gbsDydt
+              );
+
+              // Neville-Aitken 多項式外挿 (h^2 についての外挿)
+              for (let j = k - 1; j >= 0; j--) {
+                const ratioSq = (seq[k] / seq[j]) * (seq[k] / seq[j]);
+                const invDenom = 1.0 / (ratioSq - 1.0);
+                for (let i = 0; i < 12; i++) {
+                  T[j][i] = T[j + 1][i] + (T[j + 1][i] - T[j][i]) * invDenom;
+                }
+              }
+
+              if (k >= 1) {
+                // T[0] (最高次外挿値) と T[1] (1つ低次の外挿値) の差で誤差判定
+                let errSqSum = 0.0;
+                for (let i = 0; i < 12; i++) {
+                  const errComp = Math.abs(T[0][i] - T[1][i]);
+                  const scale = sess.tol + sess.tol * Math.max(Math.abs(sess.state[i]), Math.abs(T[0][i]));
+                  const r = errComp / scale;
+                  errSqSum += r * r;
+                }
+                lastErrNorm = Math.sqrt(errSqSum / 12.0);
+                usedK = k;
+
+                if (lastErrNorm <= 1.0) {
+                  accepted = true;
+                  break;
+                }
+              }
+            }
+
+            if (accepted || H <= hMin) {
+              sess.state.set(T[0]);
+              sess.simTime += H;
+              sess.acceptedSteps++;
+
+              const orderEst = 2 * usedK + 1;
+              let factor = lastErrNorm === 0.0 ? 2.5 : 0.9 * Math.pow(1.0 / lastErrNorm, 1.0 / orderEst);
+              factor = Math.min(2.5, Math.max(0.25, factor));
+
+              // 少ない段数(k <= 3)で収束した場合は刻み幅を積極拡大し NFE を劇的に削減
+              if (usedK <= 3 && factor > 1.0) {
+                factor = Math.min(2.8, factor * 1.15);
+              }
+              if (H === sess.dt || factor < 1.0) {
+                sess.dt = H * factor;
+              }
+              return H;
+            } else {
+              sess.rejectedSteps++;
+              sess.dt = H * 0.45;
+            }
+          }
+          return 0.0;
+        }
+
+        /**
+         * セッションのスキームに応じた1ステップディスパッチャ
+         */
+        function stepSession(sess, maxLimit) {
+          switch (sess.schemeId) {
+            case 'euler1':   return stepEuler1(sess, maxLimit);
+            case 'verlet2':  return stepVerlet2(sess, maxLimit);
+            case 'yoshida4': return stepYoshida4(sess, maxLimit);
+            case 'bs23':
+            case 'dopri5':
+            case 'dverk6':
+            case 'rkf78':
+            case 'dop853':
+              return stepEmbeddedRK(sess, RK_TABLES[sess.schemeId], maxLimit);
+            case 'gl10':     return stepGL10(sess, maxLimit);
+            case 'gbs13':    return stepGBS13(sess, maxLimit);
+            default:
+              return stepEmbeddedRK(sess, TABLE_DOPRI5, maxLimit);
+          }
+        }
+
+        // ==========================================
+        // 7. メイン画面のシミュレーション状態管理
+        // ==========================================
+        let mainSession = createSolverSession('dopri5', 1e-11);
+        let trails = [[], [], []];
+        let fullTrailMode = true;
+        const SHORT_TRAIL_MAX = 500;
+
+        let isRunning = true;
+        let speedPerFrame = 0.100;
+        let autoZoom = true;
+
+        const view = {
+          centerX: 0.0,
+          centerY: 0.4,
+          scale: 52.0
+        };
+
+        function recordTrailPoint() {
+          for (let b = 0; b < 3; b++) {
+            const x = mainSession.state[b * 2];
+            const y = mainSession.state[b * 2 + 1];
+            const arr = trails[b];
+            if (arr.length > 0) {
+              const last = arr[arr.length - 1];
+              const distSq = (x - last.x) * (x - last.x) + (y - last.y) * (y - last.y);
+              if (distSq < 1e-5) continue;
+            }
+            arr.push({ x, y });
+            if (!fullTrailMode && arr.length > SHORT_TRAIL_MAX) {
+              arr.shift();
+            }
+          }
+        }
+
+        function updateAutoCamera(instant = false) {
+          if (!autoZoom || cssWidth === 0 || cssHeight === 0) return;
+
+          let minX = -2.5, maxX = 2.5;
+          let minY = -2.0, maxY = 3.2;
+
+          for (let b = 0; b < 3; b++) {
+            const x = mainSession.state[b * 2];
+            const y = mainSession.state[b * 2 + 1];
+            if (Number.isFinite(x) && Number.isFinite(y)) {
+              if (x < minX) minX = x;
+              if (x > maxX) maxX = x;
+              if (y < minY) minY = y;
+              if (y > maxY) maxY = y;
+            }
+          }
+
+          const spanX = Math.min(500, (maxX - minX) * 1.32);
+          const spanY = Math.min(500, (maxY - minY) * 1.32);
+          const targetScale = Math.max(2.0, Math.min(cssWidth / spanX, cssHeight / spanY));
+          const targetCenterX = (minX + maxX) * 0.5;
+          const targetCenterY = (minY + maxY) * 0.5;
+
+          const lerp = instant ? 1.0 : 0.15;
+          view.scale += (targetScale - view.scale) * lerp;
+          view.centerX += (targetCenterX - view.centerX) * lerp;
+          view.centerY += (targetCenterY - view.centerY) * lerp;
+        }
+
+        // ==========================================
+        // 8. Canvas 描画処理
+        // ==========================================
+        const canvas = document.getElementById('sim-canvas');
+        const ctx = canvas.getContext('2d');
+        let cssWidth = 0;
+        let cssHeight = 0;
+
+        function resizeCanvas() {
+          const rect = canvas.parentElement.getBoundingClientRect();
+          const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+          cssWidth = rect.width;
+          cssHeight = rect.height;
+          canvas.width = Math.round(cssWidth * dpr);
+          canvas.height = Math.round(cssHeight * dpr);
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          render();
+        }
+
+        function worldToScreen(wx, wy) {
+          return {
+            x: cssWidth * 0.5 + (wx - view.centerX) * view.scale,
+            y: cssHeight * 0.5 - (wy - view.centerY) * view.scale
+          };
+        }
+
+        function render() {
+          if (cssWidth === 0 || cssHeight === 0) return;
+
+          ctx.fillStyle = '#050811';
+          ctx.fillRect(0, 0, cssWidth, cssHeight);
+
+          drawGrid();
+
+          // 重心 (0,0) クロスヘア
+          const origin = worldToScreen(0, 0);
+          ctx.strokeStyle = 'rgba(148, 163, 184, 0.35)';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(origin.x - 8, origin.y);
+          ctx.lineTo(origin.x + 8, origin.y);
+          ctx.moveTo(origin.x, origin.y - 8);
+          ctx.lineTo(origin.x, origin.y + 8);
+          ctx.stroke();
+
+          // 初期三角形ガイド
+          const p1 = worldToScreen(1, 3);
+          const p2 = worldToScreen(-2, -1);
+          const p3 = worldToScreen(1, -1);
+          ctx.save();
+          ctx.setLineDash([4, 4]);
+          ctx.strokeStyle = 'rgba(148, 163, 184, 0.16)';
+          ctx.beginPath();
+          ctx.moveTo(p1.x, p1.y);
+          ctx.lineTo(p2.x, p2.y);
+          ctx.lineTo(p3.x, p3.y);
+          ctx.closePath();
+          ctx.stroke();
+          ctx.restore();
+
+          // 軌跡描画
+          for (let b = 0; b < 3; b++) {
+            const pts = trails[b];
+            if (pts.length < 2) continue;
+
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            if (fullTrailMode) {
+              ctx.beginPath();
+              const p0 = worldToScreen(pts[0].x, pts[0].y);
+              ctx.moveTo(p0.x, p0.y);
+              for (let i = 1; i < pts.length; i++) {
+                const p = worldToScreen(pts[i].x, pts[i].y);
+                ctx.lineTo(p.x, p.y);
+              }
+              ctx.strokeStyle = BODY_COLORS[b] + '99';
+              ctx.lineWidth = 1.6;
+              ctx.stroke();
+            } else {
+              const len = pts.length;
+              const chunk = 16;
+              for (let start = 0; start < len - 1; start += chunk) {
+                const end = Math.min(len - 1, start + chunk);
+                const alpha = Math.max(0.08, (end / len) * 0.9);
+                ctx.beginPath();
+                const ps = worldToScreen(pts[start].x, pts[start].y);
+                ctx.moveTo(ps.x, ps.y);
+                for (let i = start + 1; i <= end; i++) {
+                  const p = worldToScreen(pts[i].x, pts[i].y);
+                  ctx.lineTo(p.x, p.y);
+                }
+                ctx.strokeStyle = hexToRgba(BODY_COLORS[b], alpha);
+                ctx.lineWidth = 1.2 + (end / len) * 1.4;
+                ctx.stroke();
+              }
+            }
+          }
+
+          // 3質点描画
+          for (let b = 0; b < 3; b++) {
+            const wx = mainSession.state[b * 2];
+            const wy = mainSession.state[b * 2 + 1];
+            if (!Number.isFinite(wx) || !Number.isFinite(wy)) continue;
+            const pos = worldToScreen(wx, wy);
+            const radius = 3.8 + Math.sqrt(MASSES[b]) * 2.2;
+
+            const grad = ctx.createRadialGradient(pos.x, pos.y, radius * 0.2, pos.x, pos.y, radius * 2.6);
+            grad.addColorStop(0, hexToRgba(BODY_COLORS[b], 0.55));
+            grad.addColorStop(1, hexToRgba(BODY_COLORS[b], 0.0));
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(pos.x, pos.y, radius * 2.6, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = BODY_COLORS[b];
+            ctx.beginPath();
+            ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 1.1;
+            ctx.stroke();
+
+            ctx.fillStyle = '#f8fafc';
+            ctx.font = '600 10px "JetBrains Mono", monospace';
+            ctx.fillText(`m${b + 1}`, pos.x + radius + 4, pos.y + 3);
+          }
+        }
+
+        function drawGrid() {
+          let step = 1.0;
+          if (view.scale < 12) step = 10.0;
+          else if (view.scale < 22) step = 5.0;
+          else if (view.scale < 35) step = 2.0;
+          else if (view.scale > 140) step = 0.5;
+
+          const leftWorld = view.centerX - (cssWidth * 0.5) / view.scale;
+          const rightWorld = view.centerX + (cssWidth * 0.5) / view.scale;
+          const bottomWorld = view.centerY - (cssHeight * 0.5) / view.scale;
+          const topWorld = view.centerY + (cssHeight * 0.5) / view.scale;
+
+          const startX = Math.floor(leftWorld / step) * step;
+          const startY = Math.floor(bottomWorld / step) * step;
+
+          ctx.lineWidth = 1;
+          for (let gx = startX; gx <= rightWorld; gx += step) {
+            const sx = worldToScreen(gx, 0).x;
+            const isAxis = Math.abs(gx) < 1e-6;
+            ctx.strokeStyle = isAxis ? 'rgba(56, 189, 248, 0.2)' : 'rgba(28, 39, 69, 0.45)';
+            ctx.beginPath();
+            ctx.moveTo(sx, 0);
+            ctx.lineTo(sx, cssHeight);
+            ctx.stroke();
+          }
+
+          for (let gy = startY; gy <= topWorld; gy += step) {
+            const sy = worldToScreen(0, gy).y;
+            const isAxis = Math.abs(gy) < 1e-6;
+            ctx.strokeStyle = isAxis ? 'rgba(56, 189, 248, 0.2)' : 'rgba(28, 39, 69, 0.45)';
+            ctx.beginPath();
+            ctx.moveTo(0, sy);
+            ctx.lineTo(cssWidth, sy);
+            ctx.stroke();
+          }
+        }
+
+        function hexToRgba(hex, alpha) {
+          const r = parseInt(hex.slice(1, 3), 16);
+          const g = parseInt(hex.slice(3, 5), 16);
+          const b = parseInt(hex.slice(5, 7), 16);
+          return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        }
+
+        // ==========================================
+        // 9. テレメトリ更新
+        // ==========================================
+        const elTime = document.getElementById('stat-time');
+        const elNfe = document.getElementById('stat-nfe');
+        const elNfeRate = document.getElementById('stat-nfe-rate');
+        const elDt = document.getElementById('stat-dt');
+        const elOrderTag = document.getElementById('stat-order-tag');
+        const elAccepted = document.getElementById('stat-accepted');
+        const elRejected = document.getElementById('stat-rejected');
+        const elEnergyErr = document.getElementById('stat-energy-err');
+        const elTotalEnergy = document.getElementById('stat-total-energy');
+        const elEventBadge = document.getElementById('event-badge');
+
+        function updateTelemetry() {
+          const meta = SCHEMES[mainSession.schemeId];
+          elTime.textContent = mainSession.simTime.toFixed(3);
+          elNfe.textContent = nfeCount.toLocaleString();
+          const rate = mainSession.simTime > 1e-4 ? Math.round(nfeCount / mainSession.simTime) : 0;
+          elNfeRate.textContent = `${rate.toLocaleString()} /t`;
+
+          elDt.textContent = mainSession.dt.toExponential(2);
+          elOrderTag.textContent = `p=${meta.order}`;
+          elAccepted.textContent = mainSession.acceptedSteps.toLocaleString();
+          elRejected.textContent = mainSession.rejectedSteps.toLocaleString();
+
+          const currE = computeTotalEnergy(mainSession.state);
+          const relErr = Math.abs(currE - E0) / Math.abs(E0);
+          elEnergyErr.textContent = Number.isFinite(relErr) ? relErr.toExponential(2) : '発散 (NaN)';
+          elTotalEnergy.textContent = Number.isFinite(currE) ? currE.toFixed(6) : 'NaN';
+
+          if (!Number.isFinite(currE) || relErr > 0.05) {
+            elEventBadge.textContent = '精度破綻・誤差増大';
+            elEventBadge.className = 'text-[9px] px-1.5 py-0.5 rounded bg-rose-500/25 text-rose-300 font-medium truncate';
+          } else if (!isRunning && mainSession.simTime < 0.001) {
+            elEventBadge.textContent = '初期状態 (3:4:5)';
+            elEventBadge.className = 'text-[9px] px-1.5 py-0.5 rounded bg-sky-500/15 text-sky-300 font-medium truncate';
+          } else if (mainSession.dt < 5e-5 && meta.adaptive) {
+            elEventBadge.textContent = '超近接遭遇中';
+            elEventBadge.className = 'text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-medium truncate';
+          } else if (mainSession.simTime >= 60.0) {
+            elEventBadge.textContent = 'm₁脱出・連星分離';
+            elEventBadge.className = 'text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-medium truncate';
+          } else if (isRunning) {
+            elEventBadge.textContent = '積分進行中';
+            elEventBadge.className = 'text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 font-medium truncate';
+          } else {
+            elEventBadge.textContent = '一時停止中';
+            elEventBadge.className = 'text-[9px] px-1.5 py-0.5 rounded bg-slate-700/60 text-slate-300 font-medium truncate';
+          }
+        }
+
+        // ==========================================
+        // 10. メインアニメーションループ
+        // ==========================================
+        function animate() {
+          try {
+            if (isRunning) {
+              const targetTime = mainSession.simTime + speedPerFrame;
+              let subSteps = 0;
+              const maxSubStepsPerFrame = 60000;
+              const frameStartTime = performance.now();
+
+              while (mainSession.simTime < targetTime && subSteps < maxSubStepsPerFrame) {
+                const remaining = targetTime - mainSession.simTime;
+                const advanced = stepSession(mainSession, remaining);
+                if (advanced <= 0 || !Number.isFinite(mainSession.state[0])) {
+                  setRunningState(false);
+                  break;
+                }
+                subSteps++;
+                if (subSteps % 4 === 0 || mainSession.simTime >= targetTime) {
+                  recordTrailPoint();
+                }
+                if (subSteps % 1000 === 0 && performance.now() - frameStartTime > 15) {
+                  break;
+                }
+              }
+              updateAutoCamera(false);
+              updateTelemetry();
+            }
+            render();
+          } catch (err) {
+            setRunningState(false);
+            reportError(err);
+          }
+          requestAnimationFrame(animate);
+        }
+
+        // ==========================================
+        // 11. パン・ズーム操作
+        // ==========================================
+        let isDragging = false;
+        let lastPointerX = 0;
+        let lastPointerY = 0;
+        let initialPinchDist = null;
+        let initialPinchScale = view.scale;
+
+        function applyZoom(zoomFactor, pivotScreenX, pivotScreenY) {
+          const newScale = Math.min(2000.0, Math.max(1.5, view.scale * zoomFactor));
+          const worldXBefore = view.centerX + (pivotScreenX - cssWidth * 0.5) / view.scale;
+          const worldYBefore = view.centerY - (pivotScreenY - cssHeight * 0.5) / view.scale;
+          view.scale = newScale;
+          view.centerX = worldXBefore - (pivotScreenX - cssWidth * 0.5) / view.scale;
+          view.centerY = worldYBefore + (pivotScreenY - cssHeight * 0.5) / view.scale;
+          render();
+        }
+
+        function getTouchDistance(t1, t2) {
+          return Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+        }
+
+        function disableAutoZoom() {
+          if (autoZoom) {
+            autoZoom = false;
+            updateAutoZoomButton();
+          }
+        }
+
+        canvas.addEventListener('mousedown', (e) => {
+          disableAutoZoom();
+          isDragging = true;
+          lastPointerX = e.clientX;
+          lastPointerY = e.clientY;
+        });
+
+        window.addEventListener('mousemove', (e) => {
+          if (!isDragging) return;
+          const dx = e.clientX - lastPointerX;
+          const dy = e.clientY - lastPointerY;
+          view.centerX -= dx / view.scale;
+          view.centerY += dy / view.scale;
+          lastPointerX = e.clientX;
+          lastPointerY = e.clientY;
+          render();
+        });
+
+        window.addEventListener('mouseup', () => {
+          isDragging = false;
+        });
+
+        canvas.addEventListener('wheel', (e) => {
+          e.preventDefault();
+          disableAutoZoom();
+          const zoomFactor = e.deltaY < 0 ? 1.15 : 0.87;
+          applyZoom(zoomFactor, e.offsetX, e.offsetY);
+        }, { passive: false });
+
+        canvas.addEventListener('touchstart', (e) => {
+          disableAutoZoom();
+          if (e.touches.length === 1) {
+            isDragging = true;
+            lastPointerX = e.touches[0].clientX;
+            lastPointerY = e.touches[0].clientY;
+            initialPinchDist = null;
+          } else if (e.touches.length === 2) {
+            isDragging = false;
+            initialPinchDist = getTouchDistance(e.touches[0], e.touches[1]);
+            initialPinchScale = view.scale;
+          }
+        }, { passive: false });
+
+        canvas.addEventListener('touchmove', (e) => {
+          e.preventDefault();
+          if (e.touches.length === 1 && isDragging) {
+            const dx = e.touches[0].clientX - lastPointerX;
+            const dy = e.touches[0].clientY - lastPointerY;
+            view.centerX -= dx / view.scale;
+            view.centerY += dy / view.scale;
+            lastPointerX = e.touches[0].clientX;
+            lastPointerY = e.touches[0].clientY;
+            render();
+          } else if (e.touches.length === 2 && initialPinchDist) {
+            const currentDist = getTouchDistance(e.touches[0], e.touches[1]);
+            const targetScale = Math.min(2000.0, Math.max(1.5, initialPinchScale * (currentDist / initialPinchDist)));
+            const zoomFactor = targetScale / view.scale;
+            const rect = canvas.getBoundingClientRect();
+            const midX = ((e.touches[0].clientX + e.touches[1].clientX) * 0.5) - rect.left;
+            const midY = ((e.touches[0].clientY + e.touches[1].clientY) * 0.5) - rect.top;
+            applyZoom(zoomFactor, midX, midY);
+          }
+        }, { passive: false });
+
+        canvas.addEventListener('touchend', (e) => {
+          if (e.touches.length === 0) {
+            isDragging = false;
+            initialPinchDist = null;
+          } else if (e.touches.length === 1) {
+            isDragging = true;
+            lastPointerX = e.touches[0].clientX;
+            lastPointerY = e.touches[0].clientY;
+            initialPinchDist = null;
+          }
+        });
+
+        // ==========================================
+        // 12. コントロールバインド
+        // ==========================================
+        const btnPlayPause = document.getElementById('btn-play-pause');
+        const iconPlay = document.getElementById('icon-play');
+        const iconPause = document.getElementById('icon-pause');
+        const labelPlayPause = document.getElementById('label-play-pause');
+        const statusLed = document.getElementById('status-led');
+
+        function setRunningState(running) {
+          isRunning = running;
+          if (isRunning) {
+            iconPlay.classList.add('hidden');
+            iconPause.classList.remove('hidden');
+            labelPlayPause.textContent = '停止';
+            btnPlayPause.className = 'col-span-1 py-2 px-2 rounded-xl font-semibold text-xs sm:text-sm bg-amber-400 hover:bg-amber-300 active:scale-[0.98] text-slate-950 shadow-lg shadow-amber-500/20 transition flex items-center justify-center gap-1';
+            statusLed.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0';
+          } else {
+            iconPlay.classList.remove('hidden');
+            iconPause.classList.add('hidden');
+            labelPlayPause.textContent = '再生';
+            btnPlayPause.className = 'col-span-1 py-2 px-2 rounded-xl font-semibold text-xs sm:text-sm bg-sky-500 hover:bg-sky-400 active:scale-[0.98] text-slate-950 shadow-lg shadow-sky-500/20 transition flex items-center justify-center gap-1';
+            statusLed.className = 'w-2.5 h-2.5 rounded-full bg-slate-500 shrink-0';
+          }
+          updateTelemetry();
+        }
+
+        btnPlayPause.addEventListener('click', () => {
+          setRunningState(!isRunning);
+        });
+
+        function resetMainSimulation(keepRunning = false) {
+          const schemeId = document.getElementById('select-scheme').value;
+          const tolVal = parseFloat(document.getElementById('select-tol').value);
+          nfeCount = 0;
+          mainSession = createSolverSession(schemeId, tolVal);
+          trails = [[], [], []];
+          recordTrailPoint();
+          setRunningState(keepRunning);
+          updateSchemeUIHints();
+          updateTelemetry();
+          render();
+        }
+
+        const selectScheme = document.getElementById('select-scheme');
+        const selectTol = document.getElementById('select-tol');
+        const canvasSchemeBadge = document.getElementById('canvas-scheme-badge');
+        const schemeTypeHint = document.getElementById('scheme-type-hint');
+        const tolStatusHint = document.getElementById('tol-status-hint');
+
+        function updateSchemeUIHints() {
+          const meta = SCHEMES[selectScheme.value];
+          canvasSchemeBadge.textContent = meta.name;
+          schemeTypeHint.textContent = meta.type;
+          if (meta.adaptive) {
+            selectTol.disabled = false;
+            selectTol.classList.remove('opacity-50');
+            tolStatusHint.textContent = '適応刻み制御有効';
+          } else {
+            selectTol.disabled = true;
+            selectTol.classList.add('opacity-50');
+            tolStatusHint.textContent = '固定刻み法 (tol非使用)';
+          }
+        }
+
+        selectScheme.addEventListener('change', () => {
+          resetMainSimulation(true);
+          autoZoom = true;
+          updateAutoZoomButton();
+          view.centerX = 0.0;
+          view.centerY = 0.4;
+          view.scale = Math.min(cssWidth, cssHeight) / 7.5;
+        });
+
+        selectTol.addEventListener('change', () => {
+          mainSession.tol = parseFloat(selectTol.value);
+        });
+
+        document.getElementById('btn-reset-sim').addEventListener('click', () => {
+          resetMainSimulation(false);
+          autoZoom = true;
+          updateAutoZoomButton();
+          view.centerX = 0.0;
+          view.centerY = 0.4;
+          view.scale = Math.min(cssWidth, cssHeight) / 7.5;
+          render();
+        });
+
+        const btnAutoZoom = document.getElementById('btn-auto-zoom');
+        const dotAutoZoom = document.getElementById('dot-auto-zoom');
+        function updateAutoZoomButton() {
+          if (autoZoom) {
+            btnAutoZoom.className = 'bg-sky-500/20 hover:bg-sky-500/30 active:scale-95 backdrop-blur-sm text-sky-300 text-xs px-2.5 py-1.5 rounded-xl border border-sky-500/40 shadow transition flex items-center gap-1';
+            dotAutoZoom.className = 'w-2 h-2 rounded-full bg-sky-400';
+          } else {
+            btnAutoZoom.className = 'bg-space-900/85 hover:bg-slate-800 active:scale-95 backdrop-blur-sm text-slate-400 text-xs px-2.5 py-1.5 rounded-xl border border-slate-700/80 shadow transition flex items-center gap-1';
+            dotAutoZoom.className = 'w-2 h-2 rounded-full bg-slate-500';
+          }
+        }
+
+        btnAutoZoom.addEventListener('click', () => {
+          autoZoom = !autoZoom;
+          updateAutoZoomButton();
+          if (autoZoom) {
+            updateAutoCamera(true);
+            render();
+          }
+        });
+
+        document.getElementById('btn-reset-view').addEventListener('click', () => {
+          disableAutoZoom();
+          view.centerX = 0.0;
+          view.centerY = 0.4;
+          view.scale = Math.min(cssWidth, cssHeight) / 7.5;
+          render();
+        });
+
+        // 時刻ジャンプボタン
+        document.querySelectorAll('.btn-jump').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const targetT = parseFloat(btn.getAttribute('data-jump'));
+            resetMainSimulation(false);
+
+            let guard = 0;
+            const maxSteps = 800000;
+            while (mainSession.simTime < targetT && guard < maxSteps) {
+              const adv = stepSession(mainSession, targetT - mainSession.simTime);
+              if (adv <= 0 || !Number.isFinite(mainSession.state[0])) break;
+              guard++;
+              if (guard % 8 === 0 || mainSession.simTime >= targetT) {
+                recordTrailPoint();
+              }
+            }
+
+            autoZoom = true;
+            updateAutoZoomButton();
+            updateAutoCamera(true);
+            updateTelemetry();
+            render();
+          });
+        });
+
+        const btnTrailMode = document.getElementById('btn-trail-mode');
+        const labelTrailMode = document.getElementById('label-trail-mode');
+        const dotTrailMode = document.getElementById('dot-trail-mode');
+        btnTrailMode.addEventListener('click', () => {
+          fullTrailMode = !fullTrailMode;
+          labelTrailMode.textContent = fullTrailMode ? '軌跡: 全履歴' : '軌跡: 短期表示';
+          dotTrailMode.className = fullTrailMode ? 'w-2 h-2 rounded-full bg-emerald-400 shrink-0' : 'w-2 h-2 rounded-full bg-sky-400 shrink-0';
+          if (!fullTrailMode) {
+            for (let b = 0; b < 3; b++) {
+              if (trails[b].length > SHORT_TRAIL_MAX) {
+                trails[b] = trails[b].slice(-SHORT_TRAIL_MAX);
+              }
+            }
+          }
+          render();
+        });
+
+        const sliderSpeed = document.getElementById('slider-speed');
+        const labelSpeed = document.getElementById('label-speed');
+        sliderSpeed.addEventListener('input', (e) => {
+          speedPerFrame = parseFloat(e.target.value);
+          labelSpeed.textContent = speedPerFrame.toFixed(3);
+        });
+
+        // ==========================================
+        // 13. ベンチマーク比較テーブル ＆ 一括計測ロジック
+        // ==========================================
+        const benchModal = document.getElementById('bench-modal');
+        const benchTableBody = document.getElementById('bench-table-body');
+        const benchProgressWrap = document.getElementById('bench-progress-wrap');
+        const benchProgressLabel = document.getElementById('bench-progress-label');
+        const benchProgressPct = document.getElementById('bench-progress-pct');
+        const benchProgressBar = document.getElementById('bench-progress-bar');
+
+        let benchmarkRecords = [];
+        let isBatchRunning = false;
+
+        function renderBenchmarkTable() {
+          if (benchmarkRecords.length === 0) {
+            benchTableBody.innerHTML = `
+              <tr>
+                <td colspan="7" class="py-8 text-center font-sans text-slate-400">
+                  「全10スキーム一括計測を実行」を押すか，メイン画面の「+ 結果記録」で現在の計算結果を追加してください．
+                </td>
+              </tr>`;
+            return;
+          }
+
+          benchTableBody.innerHTML = benchmarkRecords.map((rec) => {
+            const eErrStr = Number.isFinite(rec.energyErr) ? rec.energyErr.toExponential(2) : '発散';
+            const posErrStr = rec.posErr === null
+              ? '—'
+              : (Number.isFinite(rec.posErr) ? rec.posErr.toExponential(2) : '発散');
+
+            const isHighAccuracy = Number.isFinite(rec.energyErr) && rec.energyErr < 1e-9;
+            const rowClass = rec.isRef
+              ? 'bg-sky-500/10'
+              : (isHighAccuracy ? 'hover:bg-slate-800/50' : 'bg-rose-950/15 hover:bg-slate-800/50');
+
+            return `
+              <tr class="${rowClass} transition">
+                <td class="py-2 px-2.5 font-sans font-medium text-slate-100">
+                  ${rec.name}
+                  ${rec.tag ? `<span class="ml-1 text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">${rec.tag}</span>` : ''}
+                </td>
+                <td class="py-2 px-2 text-center text-amber-300 font-bold">${rec.order}次</td>
+                <td class="py-2 px-2 text-right text-slate-300">${rec.t.toFixed(2)}</td>
+                <td class="py-2 px-2.5 text-right text-emerald-400 font-bold">${rec.nfe.toLocaleString()}</td>
+                <td class="py-2 px-2.5 text-right text-cyan-300">${eErrStr}</td>
+                <td class="py-2 px-2.5 text-right text-amber-200">${posErrStr}</td>
+                <td class="py-2 px-2 text-right text-slate-400">${rec.ms !== null ? rec.ms.toFixed(1) + ' ms' : '手動記録'}</td>
+              </tr>`;
+          }).join('');
+        }
+
+        // 手動スナップショット記録
+        document.getElementById('btn-record-snapshot').addEventListener('click', () => {
+          const meta = SCHEMES[mainSession.schemeId];
+          const currE = computeTotalEnergy(mainSession.state);
+          const relErr = Math.abs(currE - E0) / Math.abs(E0);
+
+          benchmarkRecords.unshift({
+            name: meta.short,
+            tag: meta.adaptive ? `tol=${mainSession.tol.toExponential(0)}` : '固定刻み',
+            order: meta.order,
+            t: mainSession.simTime,
+            nfe: nfeCount,
+            energyErr: relErr,
+            posErr: null,
+            ms: null,
+            isRef: false
+          });
+          renderBenchmarkTable();
+          benchModal.classList.remove('hidden');
+        });
+
+        // 特定スキームを指定時刻 targetT まで独立して走らせるヘルパー
+        function integrateSchemeToTarget(schemeId, tolVal, targetT) {
+          const savedNfe = nfeCount;
+          nfeCount = 0;
+          const sess = createSolverSession(schemeId, tolVal);
+          const t0 = performance.now();
+
+          let guard = 0;
+          const maxSteps = 1200000;
+          while (sess.simTime < targetT && guard < maxSteps) {
+            const adv = stepSession(sess, targetT - sess.simTime);
+            if (adv <= 0 || !Number.isFinite(sess.state[0])) break;
+            guard++;
+          }
+
+          const elapsedMs = performance.now() - t0;
+          const usedNfe = nfeCount;
+          nfeCount = savedNfe; // メイン画面のカウンタを復元
+
+          const currE = computeTotalEnergy(sess.state);
+          const relErr = Math.abs(currE - E0) / Math.abs(E0);
+
+          return {
+            state: sess.state,
+            simTime: sess.simTime,
+            nfe: usedNfe,
+            energyErr: relErr,
+            ms: elapsedMs
+          };
+        }
+
+        function computePositionL2Error(stateA, stateB) {
+          let sumSq = 0.0;
+          for (let i = 0; i < 6; i++) {
+            const d = stateA[i] - stateB[i];
+            if (!Number.isFinite(d)) return Infinity;
+            sumSq += d * d;
+          }
+          return Math.sqrt(sumSq);
+        }
+
+        // 全10スキーム一括ベンチマーク実行（UIフリーズ防止のチャンク非同期実行）
+        document.getElementById('btn-run-batch-bench').addEventListener('click', () => {
+          if (isBatchRunning) return;
+          isBatchRunning = true;
+          setRunningState(false);
+
+          const targetT = parseFloat(document.getElementById('bench-target-t').value);
+          const benchTol = parseFloat(document.getElementById('bench-tol').value);
+          const schemeKeys = Object.keys(SCHEMES);
+
+          benchProgressWrap.classList.remove('hidden');
+          benchProgressLabel.textContent = '13次 GBS外挿法 (tol=1e-13) で厳密参照解を計算中...';
+          benchProgressPct.textContent = '5%';
+          benchProgressBar.style.width = '5%';
+
+          setTimeout(() => {
+            try {
+              // Step 0: 13次 GBS-13 (tol=1e-13) による厳密参照解の生成
+              const refRes = integrateSchemeToTarget('gbs13', 1e-13, targetT);
+              const results = [];
+
+              let idx = 0;
+              function runNextScheme() {
+                if (idx >= schemeKeys.length) {
+                  // 完了
+                  benchmarkRecords = results;
+                  renderBenchmarkTable();
+                  benchProgressWrap.classList.add('hidden');
+                  isBatchRunning = false;
+                  return;
+                }
+
+                const key = schemeKeys[idx];
+                const meta = SCHEMES[key];
+                const pct = Math.round(((idx + 1) / (schemeKeys.length + 1)) * 100);
+                benchProgressLabel.textContent = `計測中 (${idx + 1}/10): ${meta.name}`;
+                benchProgressPct.textContent = `${pct}%`;
+                benchProgressBar.style.width = `${pct}%`;
+
+                setTimeout(() => {
+                  try {
+                    const res = integrateSchemeToTarget(key, benchTol, targetT);
+                    const posErr = computePositionL2Error(res.state, refRes.state);
+                    results.push({
+                      name: meta.short,
+                      tag: meta.adaptive ? `tol=${benchTol.toExponential(0)}` : `h=${meta.fixedDt}`,
+                      order: meta.order,
+                      t: res.simTime,
+                      nfe: res.nfe,
+                      energyErr: res.energyErr,
+                      posErr: posErr,
+                      ms: res.ms,
+                      isRef: key === 'gbs13'
+                    });
+                    idx++;
+                    runNextScheme();
+                  } catch (e) {
+                    isBatchRunning = false;
+                    benchProgressWrap.classList.add('hidden');
+                    reportError(e);
+                  }
+                }, 16);
+              }
+
+              runNextScheme();
+            } catch (e) {
+              isBatchRunning = false;
+              benchProgressWrap.classList.add('hidden');
+              reportError(e);
+            }
+          }, 25);
+        });
+
+        document.getElementById('btn-clear-bench').addEventListener('click', () => {
+          benchmarkRecords = [];
+          renderBenchmarkTable();
+        });
+
+        // ベンチマークモーダル開閉
+        document.getElementById('btn-open-bench').addEventListener('click', () => {
+          benchModal.classList.remove('hidden');
+        });
+        document.getElementById('btn-close-bench').addEventListener('click', () => {
+          benchModal.classList.add('hidden');
+        });
+        document.getElementById('btn-close-bench-footer').addEventListener('click', () => {
+          benchModal.classList.add('hidden');
+        });
+        benchModal.addEventListener('click', (e) => {
+          if (e.target === benchModal) benchModal.classList.add('hidden');
+        });
+
+        // 数理解説モーダル開閉
+        const mathModal = document.getElementById('math-modal');
+        document.getElementById('btn-open-modal').addEventListener('click', () => {
+          mathModal.classList.remove('hidden');
+        });
+        document.getElementById('btn-close-modal').addEventListener('click', () => {
+          mathModal.classList.add('hidden');
+        });
+        document.getElementById('btn-close-modal-footer').addEventListener('click', () => {
+          mathModal.classList.add('hidden');
+        });
+        mathModal.addEventListener('click', (e) => {
+          if (e.target === mathModal) mathModal.classList.add('hidden');
+        });
+
+        // ==========================================
+        // 14. 初期化および描画ループ開始
+        // ==========================================
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+        view.scale = Math.min(cssWidth, cssHeight) / 7.5;
+        updateSchemeUIHints();
+        recordTrailPoint();
+        setRunningState(true);
+        requestAnimationFrame(animate);
+
+      } catch (err) {
+        reportError(err);
+      }
+    });
+  </script>
+</body>
+</html>
+```
